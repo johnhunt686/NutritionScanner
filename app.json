@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name": "nutriScan",
+    "slug": "nutriscan",
+    "platforms": ["ios", "android", "web"],
+    "entryPoint": "./index.tsx"
+  }
+}
