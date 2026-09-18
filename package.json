@@ -2,35 +2,42 @@
   "name": "nutriscan",
   "version": "0.1.0",
   "private": true,
-  "main": "index.js",
+  "main": "index.tsx",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --dev-client",
     "web": "expo start --web",
     "build:web": "expo build:web",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "dependencies": {
-    "expo": "^48.0.0",
-    "react": "18.2.0",
-    "react-native": "0.71.8"
+    "expo": "^57.0.24",
+    "expo-camera": "~57.0.5",
+    "expo-splash-screen": "~57.0.9",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.20.0",
     "@types/jest": "^29.5.0",
-    "@types/react": "^18.2.0",
+    "@types/react": "~19.2.4",
     "@types/react-native": "^0.71.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "babel-preset-expo": "^57.0.12",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-react": "^7.32.0",
     "eslint-plugin-react-native": "^4.0.0",
     "jest": "^29.5.0",
-    "jest-expo": "^48.0.0",
+    "jest-expo": "~57.0.5",
     "prettier": "^3.0.0",
-    "typescript": "5.3.3"
+    "typescript": "~6.0.3"
   }
 }
