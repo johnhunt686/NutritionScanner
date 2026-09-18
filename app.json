@@ -2,7 +2,31 @@
   "expo": {
     "name": "nutriScan",
     "slug": "nutriscan",
-    "platforms": ["ios", "android", "web"],
-    "entryPoint": "./index.tsx"
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
+        }
+      ],
+      "expo-splash-screen",
+      "expo-status-bar"
+    ],
+    "android": {
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.nutriscan"
+    },
+    "ios": {
+      "bundleIdentifier": "com.anonymous.nutriscan"
+    }
   }
 }

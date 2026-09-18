@@ -4,3 +4,8 @@ ios
 web-build
 .expo
 dist
+metro.config.js
+*.config.js
+node_modules/
+.expo/
+dist/

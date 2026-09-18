@@ -1,32 +1,52 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export function HomeScreen() {
+export default function HomeScreen() {
+  const [facing, setFacing] = useState<'back' | 'front'>('back');
+  const [permission, requestPermission] = useCameraPermissions();
+
+  if (!permission) {
+    return <View />;
+  }
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Button onPress={requestPermission} title="Grant permission" />
+      </View>
+    );
+  }
+
+  function toggleCameraFacing() {
+    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Nutrition Scanner</Text>
-      <Text style={styles.subtitle}>Scan a food item to view nutrition details.</Text>
+      <CameraView style={styles.camera} facing={facing} />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+          <Text style={styles.text}>Flip Camera</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#F5F7FA',
+  container: { flex: 1, justifyContent: 'center' },
+  message: { textAlign: 'center', paddingBottom: 10 },
+  camera: { flex: 1 },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 64,
+    flexDirection: 'row',
+    backgroundColor: 'transparent',
+    width: '100%',
+    paddingHorizontal: 64,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 8,
-    color: '#1F2937',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
+  button: { flex: 1, alignItems: 'center' },
+  text: { fontSize: 24, fontWeight: 'bold', color: 'white' },
 });
