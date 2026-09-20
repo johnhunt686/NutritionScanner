@@ -34,10 +34,18 @@ export default function HomeScreen({ navigation }: any) {
 
       {/*Temp button to go to preferences*/}
       <TouchableOpacity
-        style={styles.floatingButton}
+        style={styles.prefButton}
         onPress={() => navigation.navigate('Preferences')}
       >
         <Text style={styles.buttonText}>Pref</Text>
+      </TouchableOpacity>
+
+      {/*Temp button to go to lookup*/}
+      <TouchableOpacity
+        style={styles.lookupButton}
+        onPress={() => navigation.navigate('Lookup')}
+      >
+        <Text style={styles.buttonText}>Look</Text>
       </TouchableOpacity>
 
     </View>
@@ -60,10 +68,21 @@ const styles = StyleSheet.create({
   text: { fontSize: 24, fontWeight: 'bold', color: 'white' },
 
   //Temp preferences button styling
-  floatingButton: {
+  prefButton: {
     position: 'absolute',
     bottom: 60,
     right: 30,
+    backgroundColor: 'teal',
+    padding: 20,
+    borderRadius: 50,
+    zIndex: 1,
+  },
+
+  //Temp Lookup button styling
+  lookupButton: {
+    position: 'absolute',
+    bottom: 130,
+    right: 28,
     backgroundColor: 'teal',
     padding: 20,
     borderRadius: 50,
