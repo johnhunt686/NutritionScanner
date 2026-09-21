@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }: any) {
   const [facing, setFacing] = useState<'back' | 'front'>('back');
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -31,6 +31,23 @@ export default function HomeScreen() {
           <Text style={styles.text}>Flip Camera</Text>
         </TouchableOpacity>
       </View>
+
+      {/*Temp button to go to preferences*/}
+      <TouchableOpacity
+        style={styles.prefButton}
+        onPress={() => navigation.navigate('Preferences')}
+      >
+        <Text style={styles.buttonText}>Pref</Text>
+      </TouchableOpacity>
+
+      {/*Temp button to go to lookup*/}
+      <TouchableOpacity
+        style={styles.lookupButton}
+        onPress={() => navigation.navigate('Lookup')}
+      >
+        <Text style={styles.buttonText}>Look</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -49,4 +66,31 @@ const styles = StyleSheet.create({
   },
   button: { flex: 1, alignItems: 'center' },
   text: { fontSize: 24, fontWeight: 'bold', color: 'white' },
+
+  //Temp preferences button styling
+  prefButton: {
+    position: 'absolute',
+    bottom: 60,
+    right: 30,
+    backgroundColor: 'teal',
+    padding: 20,
+    borderRadius: 50,
+    zIndex: 1,
+  },
+
+  //Temp Lookup button styling
+  lookupButton: {
+    position: 'absolute',
+    bottom: 130,
+    right: 28,
+    backgroundColor: 'teal',
+    padding: 20,
+    borderRadius: 50,
+    zIndex: 1,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+
 });
