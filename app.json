@@ -7,10 +7,15 @@
       "android",
       "web"
     ],
-    "entryPoint": "./index.tsx",
     "plugins": [
       "expo-sqlite",
       "expo-asset"
-    ]
+    ],
+    "android": {
+      "package": "com.anonymous.nutriscan"
+    },
+    "ios": {
+      "bundleIdentifier": "com.anonymous.nutriscan"
+    }
   }
 }
