@@ -2,7 +2,15 @@
   "expo": {
     "name": "nutriScan",
     "slug": "nutriscan",
-    "platforms": ["ios", "android", "web"],
-    "entryPoint": "./index.tsx"
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "entryPoint": "./index.tsx",
+    "plugins": [
+      "expo-sqlite",
+      "expo-asset"
+    ]
   }
 }
