@@ -2,11 +2,7 @@
   "expo": {
     "name": "nutriScan",
     "slug": "nutriscan",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "plugins": [
       [
         "expo-camera",
@@ -19,10 +15,7 @@
       "expo-status-bar"
     ],
     "android": {
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
-      ],
+      "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
       "package": "com.anonymous.nutriscan"
     },
     "ios": {
