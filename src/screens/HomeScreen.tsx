@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function HomeScreen({ navigation }: any) {
   const [facing, setFacing] = useState<'back' | 'front'>('back');
   const [permission, requestPermission] = useCameraPermissions();
