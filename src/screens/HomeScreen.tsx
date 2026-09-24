@@ -47,6 +47,13 @@ export default function HomeScreen({ navigation }: any) {
       >
         <Text style={styles.buttonText}>Look</Text>
       </TouchableOpacity>
+      {/*Temp button to go to results*/}
+      <TouchableOpacity
+        style={styles.resultButton}
+        onPress={() => navigation.navigate('ScanConfirmation')}
+      >
+        <Text style={styles.buttonText}>Confirm</Text>
+      </TouchableOpacity>
 
     </View>
   );
@@ -88,6 +95,18 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     zIndex: 1,
   },
+
+  //Temp Scan Comfirm button styling
+  resultButton: {
+    position: 'absolute',
+    bottom: 200,
+    right: 28,
+    backgroundColor: 'teal',
+    padding: 20,
+    borderRadius: 50,
+    zIndex: 1,
+  },
+
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
