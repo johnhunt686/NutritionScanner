@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import Fuse from 'fuse.js';
 
 export default function Lookup() {
@@ -24,14 +24,12 @@ export default function Lookup() {
   ];
 
   const fuse = new Fuse(exampleResults, {
-  keys: ['name', 'description'],
-  threshold: 0.4,
+    keys: ['name', 'description'],
+    threshold: 0.4,
   });
 
   const filteredResults =
-    search.trim() === ''
-      ? exampleResults
-      : fuse.search(search).map((result) => result.item);
+    search.trim() === '' ? exampleResults : fuse.search(search).map((result) => result.item);
 
   return (
     <View style={styles.container}>
