@@ -3,7 +3,8 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function HomeScreen() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function HomeScreen({ navigation }: any) {
   const [permission, requestPermission] = useCameraPermissions();
 
   if (!permission) {
@@ -39,6 +40,23 @@ export default function HomeScreen() {
           <Ionicons name="options-outline" size={32} color="white" />
         </TouchableOpacity>
       </View>
+
+      {/*Temp button to go to preferences*/}
+      <TouchableOpacity
+        style={styles.prefButton}
+        onPress={() => navigation.navigate('Preferences')}
+      >
+        <Text style={styles.buttonText}>Pref</Text>
+      </TouchableOpacity>
+
+      {/*Temp button to go to lookup*/}
+      <TouchableOpacity
+        style={styles.lookupButton}
+        onPress={() => navigation.navigate('Lookup')}
+      >
+        <Text style={styles.buttonText}>Look</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -91,4 +109,33 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.4)',
   },
+  button: { flex: 1, alignItems: 'center' },
+  text: { fontSize: 24, fontWeight: 'bold', color: 'white' },
+
+  //Temp preferences button styling
+  prefButton: {
+    position: 'absolute',
+    bottom: 60,
+    right: 30,
+    backgroundColor: 'teal',
+    padding: 20,
+    borderRadius: 50,
+    zIndex: 1,
+  },
+
+  //Temp Lookup button styling
+  lookupButton: {
+    position: 'absolute',
+    bottom: 130,
+    right: 28,
+    backgroundColor: 'teal',
+    padding: 20,
+    borderRadius: 50,
+    zIndex: 1,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+
 });
