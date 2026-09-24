@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function Lookup() {
   const [search, setSearch] = useState('');
@@ -35,9 +35,7 @@ export default function Lookup() {
         {exampleResults.map((result) => (
           <View key={result.id} style={styles.result}>
             <Text style={styles.resultName}>{result.name}</Text>
-            <Text style={styles.resultDescription}>
-              {result.description}
-            </Text>
+            <Text style={styles.resultDescription}>{result.description}</Text>
           </View>
         ))}
       </ScrollView>

@@ -12,7 +12,7 @@ export function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Preferences" component={Preferences} />
         <Stack.Screen name="Lookup" component={Lookup} />
       </Stack.Navigator>

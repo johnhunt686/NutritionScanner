@@ -1,7 +1,7 @@
-import { useNetworkState } from "expo-network";
+import { useNetworkState } from 'expo-network';
 
 const networkState = useNetworkState();
 
 export const useIsOnline = () => {
-    return networkState.isInternetReachable;
-}
+  return networkState.isInternetReachable;
+};

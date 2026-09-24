@@ -10,29 +10,13 @@ export default function Preferences() {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <PreferenceRow
-          label="Poop Allergy"
-          value={poopAllergy}
-          onValueChange={setPoopAllergy}
-        />
+        <PreferenceRow label="Poop Allergy" value={poopAllergy} onValueChange={setPoopAllergy} />
 
-        <PreferenceRow
-          label="Dark Mode"
-          value={darkMode}
-          onValueChange={setDarkMode}
-        />
+        <PreferenceRow label="Dark Mode" value={darkMode} onValueChange={setDarkMode} />
 
-        <PreferenceRow
-          label="Explode On Start"
-          value={explode}
-          onValueChange={setExplode}
-        />
+        <PreferenceRow label="Explode On Start" value={explode} onValueChange={setExplode} />
 
-        <PreferenceRow
-          label="Vibrations"
-          value={vibrations}
-          onValueChange={setVibrations}
-        />
+        <PreferenceRow label="Vibrations" value={vibrations} onValueChange={setVibrations} />
       </ScrollView>
     </View>
   );
@@ -44,19 +28,12 @@ type PreferenceRowProps = {
   onValueChange: (value: boolean) => void;
 };
 
-function PreferenceRow({
-  label,
-  value,
-  onValueChange,
-}: PreferenceRowProps) {
+function PreferenceRow({ label, value, onValueChange }: PreferenceRowProps) {
   return (
     <View style={styles.row}>
       <Text style={styles.label}>{label}</Text>
 
-      <Switch
-        value={value}
-        onValueChange={onValueChange}
-      />
+      <Switch value={value} onValueChange={onValueChange} />
     </View>
   );
 }
