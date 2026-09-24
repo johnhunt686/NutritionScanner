@@ -50,13 +50,9 @@ export default function HomeScreen({ navigation }: any) {
       </TouchableOpacity>
 
       {/*Temp button to go to lookup*/}
-      <TouchableOpacity
-        style={styles.lookupButton}
-        onPress={() => navigation.navigate('Lookup')}
-      >
+      <TouchableOpacity style={styles.lookupButton} onPress={() => navigation.navigate('Lookup')}>
         <Text style={styles.buttonText}>Look</Text>
       </TouchableOpacity>
-
     </View>
   );
 }
@@ -137,5 +133,4 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
-
 });
