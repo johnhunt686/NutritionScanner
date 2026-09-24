@@ -44,16 +44,16 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    justifyContent: 'center' 
+  container: {
+    flex: 1,
+    justifyContent: 'center',
   },
-  message: { 
-    textAlign: 'center', 
-    paddingBottom: 10 
+  message: {
+    textAlign: 'center',
+    paddingBottom: 10,
   },
-  camera: { 
-    flex: 1 
+  camera: {
+    flex: 1,
   },
   permissionButton: {
     backgroundColor: '#007AFF',
@@ -61,9 +61,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: 'center',
   },
-  permissionText: { 
-    color: 'white', 
-    fontWeight: 'bold' 
+  permissionText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 
   // Shrink-wraps horizontally around the circular buttons
