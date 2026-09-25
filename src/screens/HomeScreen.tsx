@@ -63,7 +63,6 @@ export default function HomeScreen({ navigation }: Props) {
       >
         <Text style={styles.buttonText}>Confirm</Text>
       </TouchableOpacity>
-
     </View>
   );
 }

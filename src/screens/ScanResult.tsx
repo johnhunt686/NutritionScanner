@@ -28,7 +28,6 @@ export default function ScanResult({ route }: Props) {
 
   return (
     <View style={styles.container}>
-      
       <View style={styles.scannedTextPlaceholder}>
         <Text style={styles.scannedText}>{scannedText}</Text>
       </View>
@@ -40,9 +39,7 @@ export default function ScanResult({ route }: Props) {
           <View key={result.id} style={styles.result}>
             <Text style={styles.resultName}>{result.name}</Text>
 
-            <Text style={styles.resultDescription}>
-              {result.description}
-            </Text>
+            <Text style={styles.resultDescription}>{result.description}</Text>
           </View>
         ))}
       </ScrollView>

@@ -5,15 +5,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import Preferences from '../screens/Preferences';
 import Lookup from '../screens/Lookup';
-import ScanConfirmation from '../screens/ScanConfirmation'
-import ScanResult from '../screens/ScanResult'
+import ScanConfirmation from '../screens/ScanConfirmation';
+import ScanResult from '../screens/ScanResult';
 
 export type RootStackParamList = {
   Home: undefined;
   Preferences: undefined;
   Lookup: undefined;
-  ScanConfirmation: | {scannedText: string} | undefined;
-  ScanResult: {scannedText: string};
+  ScanConfirmation: { scannedText: string } | undefined;
+  ScanResult: { scannedText: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
