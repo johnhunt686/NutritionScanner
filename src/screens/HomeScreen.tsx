@@ -2,9 +2,12 @@ import React from 'react';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function HomeScreen({ navigation }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+export default function HomeScreen({ navigation }: Props) {
   const [permission, requestPermission] = useCameraPermissions();
 
   if (!permission) {
@@ -52,6 +55,13 @@ export default function HomeScreen({ navigation }: any) {
       {/*Temp button to go to lookup*/}
       <TouchableOpacity style={styles.lookupButton} onPress={() => navigation.navigate('Lookup')}>
         <Text style={styles.buttonText}>Look</Text>
+      </TouchableOpacity>
+      {/*Temp button to go to results*/}
+      <TouchableOpacity
+        style={styles.resultButton}
+        onPress={() => navigation.navigate('ScanConfirmation')}
+      >
+        <Text style={styles.buttonText}>Confirm</Text>
       </TouchableOpacity>
     </View>
   );
@@ -129,6 +139,18 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     zIndex: 1,
   },
+
+  //Temp Scan Comfirm button styling
+  resultButton: {
+    position: 'absolute',
+    bottom: 200,
+    right: 28,
+    backgroundColor: 'teal',
+    padding: 20,
+    borderRadius: 50,
+    zIndex: 1,
+  },
+
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
