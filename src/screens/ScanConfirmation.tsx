@@ -1,7 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
-export default function ScanConfirmation({ route, navigation }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, 'ScanConfirmation'>;
+
+export default function ScanConfirmation({ route, navigation }: Props) {
   const scannedText = route.params?.scannedText ?? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vel arcu commodo, tincidunt tellus ut, volutpat ex. Nam et massa ullamcorper, bibendum tortor eu, egestas massa';
 
   const confirmScan = () => {

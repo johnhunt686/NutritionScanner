@@ -1,7 +1,11 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
-export default function ScanResult({ route }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, 'ScanResult'>;
+
+export default function ScanResult({ route }: Props) {
   const scannedText = route.params?.scannedText;
 
   const exampleResults = [

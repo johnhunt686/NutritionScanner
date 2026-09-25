@@ -2,9 +2,12 @@ import React from 'react';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function HomeScreen({ navigation }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+export default function HomeScreen({ navigation }: Props) {
   const [permission, requestPermission] = useCameraPermissions();
 
   if (!permission) {

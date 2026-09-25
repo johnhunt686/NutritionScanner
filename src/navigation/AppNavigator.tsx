@@ -8,7 +8,15 @@ import Lookup from '../screens/Lookup';
 import ScanConfirmation from '../screens/ScanConfirmation'
 import ScanResult from '../screens/ScanResult'
 
-const Stack = createNativeStackNavigator();
+export type RootStackParamList = {
+  Home: undefined;
+  Preferences: undefined;
+  Lookup: undefined;
+  ScanConfirmation: | {scannedText: string} | undefined;
+  ScanResult: {scannedText: string};
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppNavigator() {
   return (
