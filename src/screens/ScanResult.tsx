@@ -24,6 +24,10 @@ export default function ScanResult({ route }: any) {
 
   return (
     <View style={styles.container}>
+      
+      <View style={styles.scannedTextPlaceholder}>
+        <Text style={styles.scannedText}>{scannedText}</Text>
+      </View>
 
       <Text style={styles.resultsTitle}>Results</Text>
 
@@ -48,7 +52,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
 
+  scannedTextPlaceholder: {
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
 
+  scannedText: {
+    fontSize: 12,
+  },
 
   resultsTitle: {
     fontSize: 18,
