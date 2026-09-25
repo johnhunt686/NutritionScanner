@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import Fuse from 'fuse.js';
 
 export default function Lookup() {
   const [search, setSearch] = useState('');
@@ -22,22 +23,28 @@ export default function Lookup() {
     },
   ];
 
+  const fuse = new Fuse(exampleResults, {
+    keys: ['name', 'description'],
+    threshold: 0.4,
+  });
+
+  const filteredResults =
+    search.trim() === '' ? exampleResults : fuse.search(search).map((result) => result.item);
+
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.searchBar}
-        placeholder="Search...  (Basically does NOTHING rn)"
+        placeholder="Search..."
         value={search}
         onChangeText={setSearch}
       />
 
       <ScrollView>
-        {exampleResults.map((result) => (
+        {filteredResults.map((result) => (
           <View key={result.id} style={styles.result}>
             <Text style={styles.resultName}>{result.name}</Text>
-            <Text style={styles.resultDescription}>
-              {result.description}
-            </Text>
+            <Text style={styles.resultDescription}>{result.description}</Text>
           </View>
         ))}
       </ScrollView>
