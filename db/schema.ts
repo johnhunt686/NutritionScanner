@@ -1,11 +1,4 @@
-import {
-  sqliteTable,
-  text,
-  integer,
-  index,
-  uniqueIndex,
-  check,
-} from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index, uniqueIndex, check } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 
 // ==========================================
@@ -38,7 +31,7 @@ export const tags = sqliteTable(
   },
   (table) => ({
     ingredientIdx: index('tags_ingredient_id_idx').on(table.ingredientId),
-  })
+  }),
 );
 
 export type Tag = typeof tags.$inferSelect;
@@ -58,10 +51,8 @@ export const descriptions = sqliteTable(
     descriptionLong: text('description_long'),
   },
   (table) => ({
-    ingredientIdx: index('descriptions_ingredient_id_idx').on(
-      table.ingredientId
-    ),
-  })
+    ingredientIdx: index('descriptions_ingredient_id_idx').on(table.ingredientId),
+  }),
 );
 
 export type Description = typeof descriptions.$inferSelect;
@@ -96,10 +87,8 @@ export const determinations = sqliteTable(
     text: text('text').notNull(),
   },
   (table) => ({
-    ingredientIdx: index('determinations_ingredient_id_idx').on(
-      table.ingredientId
-    ),
-  })
+    ingredientIdx: index('determinations_ingredient_id_idx').on(table.ingredientId),
+  }),
 );
 
 export type Determination = typeof determinations.$inferSelect;
@@ -119,15 +108,16 @@ export const preferences = sqliteTable(
     alert: integer('alert', { mode: 'boolean' }).notNull().default(false),
   },
   (table) => ({
-    tagIdx: index('preferences_tag_id_idx').on(table.tagId),
-    ingredientIdx: index('preferences_ingredient_id_idx').on(
-      table.ingredientId
-    ),
+    // Replaced standard index with uniqueIndex to support upserts
+    uniqueTag: uniqueIndex('pref_unique_tag_idx').on(table.tagId),
+    uniqueIngredient: uniqueIndex('pref_unique_ingredient_idx').on(table.ingredientId),
+
+    // Kept your excellent mutex check
     mutexCheck: check(
       'preferences_mutex_check',
-      sql`(tag_id IS NOT NULL AND ingredient_id IS NULL) OR (tag_id IS NULL AND ingredient_id IS NOT NULL)`
+      sql`(tag_id IS NOT NULL AND ingredient_id IS NULL) OR (tag_id IS NULL AND ingredient_id IS NOT NULL)`,
     ),
-  })
+  }),
 );
 
 export type Preference = typeof preferences.$inferSelect;
@@ -150,11 +140,8 @@ export const ingredientResearch = sqliteTable(
   (table) => ({
     ingredientIdx: index('ing_res_ingredient_id_idx').on(table.ingredientId),
     researchIdx: index('ing_res_research_id_idx').on(table.researchId),
-    uniquePair: uniqueIndex('ing_res_unique_idx').on(
-      table.ingredientId,
-      table.researchId
-    ),
-  })
+    uniquePair: uniqueIndex('ing_res_unique_idx').on(table.ingredientId, table.researchId),
+  }),
 );
 
 export type IngredientResearch = typeof ingredientResearch.$inferSelect;

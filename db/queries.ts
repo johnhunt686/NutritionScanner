@@ -1,53 +1,202 @@
-import { sql } from 'drizzle-orm';
+import { sql, eq, or, and } from 'drizzle-orm';
 import { db } from './client';
-import { ingredients, tags, Ingredient } from './schema';
+import {
+  ingredients,
+  tags,
+  descriptions,
+  research,
+  determinations,
+  preferences,
+  ingredientResearch,
+  Ingredient,
+} from './schema';
 
-// 1. Debug Query: Sub-millisecond FTS search across Ingredient Formal & Common names
-export async function searchIngredients(searchTerm: string): Promise<Ingredient[]> {
+// ==========================================
+// 1. Search by Ingredient Name (FTS)
+// ==========================================
+export async function searchIngredientsByName(searchTerm: string): Promise<Ingredient[]> {
   if (!searchTerm.trim()) return [];
-
   const formattedQuery = `${searchTerm.trim()}*`;
 
-  const results = await db.all<Ingredient>(
+  // Raw SQL is best here to leverage SQLite's FTS virtual tables and rank scoring
+  return await db.all<Ingredient>(
     sql`
-      SELECT 
-        i.id, 
-        i.formal_name AS formalName, 
-        i.common_name AS commonName, 
-        i.last_updated AS lastUpdated
+      SELECT i.* 
       FROM ingredients i
       JOIN ingredients_fts fts ON i.id = fts.rowid
       WHERE ingredients_fts MATCH ${formattedQuery}
       ORDER BY rank;
-    `
+    `,
   );
-
-  return results;
 }
 
-// 2. Debug Query: Seed test record inside a transaction to verify Foreign Keys & FTS triggers
-export async function insertDebugIngredient(
-  formalName: string,
-  commonName: string,
-  tagName: string
-) {
-  return await db.transaction(async (tx) => {
-    // Inserts ingredient (triggers FTS insert trigger automatically)
-    const [newIngredient] = await tx
-      .insert(ingredients)
-      .values({
-        formalName,
-        commonName,
+// ==========================================
+// 2. Search by Ingredient Name and/or Tag
+// ==========================================
+export async function searchIngredientsWithTags(searchTerm?: string, tagName?: string) {
+  let query = db
+    .selectDistinct({
+      id: ingredients.id,
+      formalName: ingredients.formalName,
+      commonName: ingredients.commonName,
+      lastUpdated: ingredients.lastUpdated,
+    })
+    .from(ingredients)
+    .$dynamic();
+
+  // Conditionally join tags if a tag search is requested
+  if (tagName) {
+    query = query.innerJoin(tags, eq(tags.ingredientId, ingredients.id));
+  }
+
+  const conditions = [];
+
+  // Add tag filter
+  if (tagName) {
+    conditions.push(eq(tags.name, tagName));
+  }
+
+  // Add name filter (Using standard LIKE here for combined dynamic queries,
+  // though you could swap this for an FTS join if full-text is strictly needed)
+  if (searchTerm) {
+    const term = `%${searchTerm}%`;
+    conditions.push(
+      or(sql`${ingredients.formalName} LIKE ${term}`, sql`${ingredients.commonName} LIKE ${term}`),
+    );
+  }
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions));
+  }
+
+  return await query;
+}
+
+// ==========================================
+// 3. Ingredients with Attached Data (Full Profile)
+// ==========================================
+// Note: Since `relations()` aren't defined in schema.ts, executing concurrent
+// reads is the most performant way to assemble a 1-to-many object graph.
+export async function getIngredientProfile(ingredientId: number) {
+  const [ingredient] = await db.select().from(ingredients).where(eq(ingredients.id, ingredientId));
+
+  if (!ingredient) return null;
+
+  // Run dependent queries concurrently for maximum speed
+  const [ingTags, ingDescriptions, ingDeterminations, ingResearch] = await Promise.all([
+    db.select().from(tags).where(eq(tags.ingredientId, ingredientId)),
+    db.select().from(descriptions).where(eq(descriptions.ingredientId, ingredientId)),
+    db.select().from(determinations).where(eq(determinations.ingredientId, ingredientId)),
+
+    // Join the junction table to get the actual research documents
+    db
+      .select({
+        id: research.id,
+        isLink: research.isLink,
+        summary: research.summary,
+        link: research.link,
       })
-      .returning();
+      .from(ingredientResearch)
+      .innerJoin(research, eq(ingredientResearch.researchId, research.id))
+      .where(eq(ingredientResearch.ingredientId, ingredientId)),
+  ]);
 
-    // Inserts tag tied to foreign key
-    await tx.insert(tags).values({
-      ingredientId: newIngredient.id,
-      name: tagName,
-      color: '#FF4500',
-    });
+  return {
+    ...ingredient,
+    tags: ingTags,
+    descriptions: ingDescriptions,
+    determinations: ingDeterminations,
+    research: ingResearch,
+  };
+}
 
-    return newIngredient;
-  });
+// ==========================================
+// 4. Search through Research by Ingredient or Tag
+// ==========================================
+export async function searchResearch(options: {
+  searchTerm?: string;
+  ingredientId?: number;
+  tagId?: number;
+}) {
+  let query = db
+    .selectDistinct({
+      id: research.id,
+      summary: research.summary,
+      link: research.link,
+      lastChecked: research.lastChecked,
+    })
+    .from(research)
+    .leftJoin(ingredientResearch, eq(ingredientResearch.researchId, research.id))
+    .leftJoin(tags, eq(tags.ingredientId, ingredientResearch.ingredientId))
+    .$dynamic();
+
+  const conditions = [];
+
+  if (options.ingredientId) {
+    conditions.push(eq(ingredientResearch.ingredientId, options.ingredientId));
+  }
+
+  if (options.tagId) {
+    conditions.push(eq(tags.id, options.tagId));
+  }
+
+  if (options.searchTerm) {
+    // Utilize the FTS virtual table for research summaries
+    const term = `${options.searchTerm.trim()}*`;
+    query = query.innerJoin(
+      sql`research_fts`,
+      sql`research.id = research_fts.rowid AND research_fts MATCH ${term}`,
+    );
+  }
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions));
+  }
+
+  return await query;
+}
+
+// ==========================================
+// 5. Add or Update Preferences
+// ==========================================
+export async function upsertPreference(alert: boolean, ingredientId?: number, tagId?: number) {
+  if (!ingredientId && !tagId) throw new Error('Must provide either ingredientId or tagId');
+
+  // Assumes you added the unique indexes mentioned above to schema.ts
+  return await db
+    .insert(preferences)
+    .values({
+      alert,
+      ingredientId: ingredientId ?? null,
+      tagId: tagId ?? null,
+    })
+    .onConflictDoUpdate({
+      // SQLite requires knowing exactly which constraint triggered the conflict
+      target: ingredientId ? preferences.ingredientId : preferences.tagId,
+      set: { alert },
+    })
+    .returning();
+}
+
+// ==========================================
+// 6. View Preferences (With joined context)
+// ==========================================
+export async function getPreferences() {
+  return await db
+    .select({
+      preferenceId: preferences.id,
+      alert: preferences.alert,
+
+      // Ingredient Context
+      ingredientId: ingredients.id,
+      formalName: ingredients.formalName,
+
+      // Tag Context
+      tagId: tags.id,
+      tagName: tags.name,
+      tagColor: tags.color,
+    })
+    .from(preferences)
+    .leftJoin(ingredients, eq(preferences.ingredientId, ingredients.id))
+    .leftJoin(tags, eq(preferences.tagId, tags.id));
 }

@@ -2,15 +2,8 @@
   "expo": {
     "name": "nutriScan",
     "slug": "nutriscan",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
-    "plugins": [
-      "expo-sqlite",
-      "expo-asset"
-    ],
+    "platforms": ["ios", "android", "web"],
+    "plugins": ["expo-sqlite", "expo-asset"],
     "android": {
       "package": "com.anonymous.nutriscan"
     },
