@@ -3,8 +3,21 @@
     "name": "nutriScan",
     "slug": "nutriscan",
     "platforms": ["ios", "android", "web"],
-    "plugins": ["expo-sqlite", "expo-asset"],
+    "plugins": [
+      "expo-sqlite", 
+      "expo-asset",
+      [
+        "expo-camera",
+        {
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
+        }
+      ],
+      "expo-splash-screen",
+      "expo-status-bar"
+    ],
     "android": {
+      "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
       "package": "com.anonymous.nutriscan"
     },
     "ios": {

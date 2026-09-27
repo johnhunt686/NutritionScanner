@@ -1,10 +1,16 @@
-name: CI
+name: Build Tests
 
 on:
   push:
     branches: ['main', 'master']
   pull_request:
+    types: [opened, synchronize, reopened]
     branches: ['main', 'master']
+
+# Cancels older runs for the same branch/PR when a new commit is pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   checks:
