@@ -14,7 +14,9 @@
         }
       ],
       "expo-splash-screen",
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-sqlite",
+      "expo-asset"
     ],
     "android": {
       "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
