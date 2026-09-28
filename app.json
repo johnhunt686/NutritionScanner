@@ -4,7 +4,7 @@
     "slug": "nutriscan",
     "platforms": ["ios", "android", "web"],
     "plugins": [
-      "expo-sqlite", 
+      "expo-sqlite",
       "expo-asset",
       [
         "expo-camera",
