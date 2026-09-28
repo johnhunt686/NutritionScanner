@@ -1,12 +1,8 @@
 export const radii = {
-  none: 0,
-  xs: 2,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  '2xl': 24,
-  full: 9999,
+  small: 2,
+  medium: 5,
+  large: 10,
+  full: 999,
 } as const;
 
 export type RadiusToken = keyof typeof radii;

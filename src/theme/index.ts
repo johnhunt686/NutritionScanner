@@ -1,18 +1,16 @@
+import { border } from './border';
 import { palette, semanticColors } from './colors';
 import { radii } from './radii';
 import { spacing } from './spacing';
+import { typography } from './text';
 
 export const theme = {
   colors: palette,
   semanticColors,
   radii,
   spacing,
-  borderWidths: {
-    hairline: 0.5,
-    thin: 1,
-    medium: 2,
-    thick: 4,
-  },
+  border,
+  typography,
 } as const;
 
 export type Theme = typeof theme;

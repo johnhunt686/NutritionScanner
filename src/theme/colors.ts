@@ -1,22 +1,26 @@
 export const palette = {
-  blue500: '#0066FF',
-  gray100: '#F3F4F6',
-  gray800: '#1F2937',
-  white: '#FFFFFF',
-  black: '#000000',
+  green100: '#007022',
+  green200: '#00948d',
+  green150: '#164223',
+  green250: '#164e4b',
+  yellow: '#f1ae1e',
+  red: '#cc3f14',
+  white: '#e4ffd2',
+  offWhite: '#cffdc9',
+  black: '#0d1400',
 } as const;
 
 export const semanticColors = {
-  light: {
+  theme: {
     background: palette.white,
-    text: palette.gray800,
-    primary: palette.blue500,
-    border: palette.gray100,
-  },
-  dark: {
-    background: palette.gray800,
-    text: palette.white,
-    primary: palette.blue500,
-    border: palette.gray800,
+    content: palette.offWhite,
+    text: palette.black,
+    primary: palette.green100,
+    secondary: palette.green200,
+    primaryAccent: palette.green150,
+    secondaryAccent: palette.green250,
+    border: palette.black,
+    alert: palette.red,
+    notice: palette.yellow,
   },
 } as const;

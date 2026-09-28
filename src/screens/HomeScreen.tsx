@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { CoolModal } from '@/components/ui/modal';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -28,6 +29,12 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <CameraView style={styles.camera} facing={'back'} />
+      <CoolModal
+        visible={true}
+        headerText="headertext"
+        confirmText="confirmText"
+        denyText="denyText"
+      ></CoolModal>
 
       {/* Fitted Vertical Cluster in Bottom-Right */}
       <View style={styles.buttonCluster}>
