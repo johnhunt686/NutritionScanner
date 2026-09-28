@@ -16,7 +16,7 @@ export async function searchProducts(searchTerm: string): Promise<Product[]> {
       JOIN products_fts fts ON p.id = fts.rowid
       WHERE products_fts MATCH ${formattedQuery}
       ORDER BY rank;
-    `
+    `,
   );
 
   return results;

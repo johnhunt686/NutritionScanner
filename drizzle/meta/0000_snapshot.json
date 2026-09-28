@@ -46,9 +46,7 @@
       "indexes": {
         "products_barcode_unique": {
           "name": "products_barcode_unique",
-          "columns": [
-            "barcode"
-          ],
+          "columns": ["barcode"],
           "isUnique": true
         }
       },

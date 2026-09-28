@@ -2,11 +2,7 @@
   "expo": {
     "name": "nutriScan",
     "slug": "nutriscan",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "plugins": [
       [
         "expo-camera",

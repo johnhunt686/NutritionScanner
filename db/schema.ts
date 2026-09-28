@@ -11,7 +11,7 @@ export const products = sqliteTable(
   },
   (table) => ({
     barcodeIdx: index('products_barcode_idx').on(table.barcode),
-  })
+  }),
 );
 
 // Crucial: Export these types so queries.ts can import them
