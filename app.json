@@ -8,10 +8,20 @@
       "web"
     ],
     "plugins": [
+      [
+        "expo-camera",
+        {
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
+        }
+      ],
+      "expo-splash-screen",
+      "expo-status-bar",
       "expo-sqlite",
       "expo-asset"
     ],
     "android": {
+      "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
       "package": "com.anonymous.nutriscan"
     },
     "ios": {
