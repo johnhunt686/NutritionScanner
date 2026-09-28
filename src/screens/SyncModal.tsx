@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AppState, AppStateStatus, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  AppState,
+  AppStateStatus,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function SyncModal() {
   const [visible, setVisible] = useState(true);
@@ -8,10 +16,7 @@ export default function SyncModal() {
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextState) => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextState === 'active'
-      ) {
+      if (appState.current.match(/inactive|background/) && nextState === 'active') {
         setVisible(true);
       }
 
@@ -34,10 +39,7 @@ export default function SyncModal() {
         <View style={styles.modal}>
           <Text style={styles.title}>Sync Database</Text>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setVisible(false)}
-          >
+          <TouchableOpacity style={styles.button} onPress={() => setVisible(false)}>
             <Text style={styles.buttonText}>Agree</Text>
           </TouchableOpacity>
         </View>
