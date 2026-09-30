@@ -3,6 +3,9 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { IngredientResult } from '@/components/ui/IngredientResult';
+import { theme } from '../theme';
+
+const { semanticColors, spacing, border, typography } = theme;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ScanResult'>;
 
@@ -65,23 +68,27 @@ export default function ScanResult({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
   },
 
   scannedTextPlaceholder: {
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    paddingVertical: spacing.md,
+    borderBottomWidth: border.thin,
+    borderBottomColor: semanticColors.theme.border,
   },
 
   scannedText: {
-    fontSize: 12,
+    color: semanticColors.theme.primaryAccent,
+    fontSize: typography.fontSizes.xsmall,
+    fontFamily: typography.fonts.mono,
   },
 
   resultsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 16,
-    marginBottom: 8,
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.large,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
   },
 });

@@ -1,5 +1,8 @@
 import React from 'react';
 import { StyleProp, StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
+import { theme } from '../../theme';
+
+const { semanticColors, radii, spacing, typography } = theme;
 
 export interface NavButtonProps {
   label: string;
@@ -18,13 +21,14 @@ export const NavButton: React.FC<NavButtonProps> = ({ label, onPress, style }) =
 const styles = StyleSheet.create({
   button: {
     position: 'absolute',
-    backgroundColor: 'teal',
-    padding: 20,
-    borderRadius: 50,
+    backgroundColor: semanticColors.theme.primary,
+    padding: spacing.md,
+    borderRadius: radii.full,
     zIndex: 1,
   },
   text: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: semanticColors.theme.background,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
   },
 });

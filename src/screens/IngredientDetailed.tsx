@@ -2,6 +2,9 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { theme } from '../theme';
+
+const { semanticColors, spacing, border, typography } = theme;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'IngredientDetailed'>;
 
@@ -15,17 +18,17 @@ export default function IngredientDetailed({ route }: Props) {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Category</Text>
-        <Text>Placeholder category</Text>
+        <Text style={styles.body}>Placeholder category</Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Common Uses</Text>
-        <Text>Placeholder information about common uses.</Text>
+        <Text style={styles.body}>Placeholder information about common uses.</Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Additional Notes</Text>
-        <Text>Placeholder information about this ingredient.</Text>
+        <Text style={styles.body}>Placeholder information about this ingredient.</Text>
       </View>
     </ScrollView>
   );
@@ -33,24 +36,35 @@ export default function IngredientDetailed({ route }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: spacing.md,
   },
   name: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.display,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
   },
   description: {
-    marginTop: 8,
-    fontSize: 16,
+    marginTop: spacing.sm,
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.body,
   },
   section: {
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    paddingVertical: spacing.md,
+    borderBottomWidth: border.thin,
+    borderBottomColor: semanticColors.theme.border,
   },
   sectionTitle: {
-    marginBottom: 4,
-    fontSize: 16,
-    fontWeight: 'bold',
+    marginBottom: spacing.xs,
+    color: semanticColors.theme.primaryAccent,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
+  },
+  body: {
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.body,
   },
 });

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { theme } from '../theme';
+
+const { semanticColors, spacing, border, typography } = theme;
 
 export default function Preferences() {
   const [poopAllergy, setPoopAllergy] = useState(true);
@@ -33,7 +36,15 @@ function PreferenceRow({ label, value, onValueChange }: PreferenceRowProps) {
     <View style={styles.row}>
       <Text style={styles.label}>{label}</Text>
 
-      <Switch value={value} onValueChange={onValueChange} />
+        <Switch
+          value={value}
+          onValueChange={onValueChange}
+          trackColor={{
+            false: semanticColors.theme.secondaryAccent,
+            true: semanticColors.theme.secondary,
+          }}
+          thumbColor={semanticColors.theme.background}
+        />
     </View>
   );
 }
@@ -41,17 +52,19 @@ function PreferenceRow({ label, value, onValueChange }: PreferenceRowProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    paddingVertical: spacing.md,
+    borderBottomWidth: border.thin,
+    borderBottomColor: semanticColors.theme.border,
   },
   label: {
-    fontSize: 16,
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.body,
   },
 });

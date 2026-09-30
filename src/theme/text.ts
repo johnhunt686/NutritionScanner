@@ -9,9 +9,12 @@ export const typography = {
     mono: 'monospace',
   },
   fontSizes: {
+    xsmall: 12,
     small: 14,
     medium: 16, // Standard body text
     large: 18,
+    xlarge: 20,
+    display: 24,
   },
   fontWeights: {
     light: '400',

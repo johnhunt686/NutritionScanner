@@ -4,6 +4,9 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { NavButton } from '@/components/ui/NavButton';
+import { theme } from '../theme';
+
+const { semanticColors, radii, spacing, typography } = theme;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -57,20 +60,23 @@ const styles = StyleSheet.create({
   },
   message: {
     textAlign: 'center',
-    paddingBottom: 10,
+    paddingBottom: spacing.md,
+    color: semanticColors.theme.text,
+    fontFamily: typography.fonts.body,
   },
   camera: {
     flex: 1,
   },
   permissionButton: {
-    backgroundColor: '#007AFF',
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: semanticColors.theme.primary,
+    padding: spacing.sm,
+    borderRadius: radii.medium,
     alignSelf: 'center',
   },
   permissionText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: semanticColors.theme.background,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
   },
 
   prefButton: {
