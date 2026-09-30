@@ -27,7 +27,7 @@ export default function HomeScreen({ navigation }: Props) {
   const [isScanning, setIsScanning] = useState(false);
   const [photoCount, setPhotoCount] = useState(0);
 
-  const [ocrResults, setOcrResults] = useState<OCRResult[]>([]);
+  const [, setOcrResults] = useState<OCRResult[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   /*
