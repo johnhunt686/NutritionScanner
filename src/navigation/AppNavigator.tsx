@@ -7,6 +7,7 @@ import Preferences from '../screens/Preferences';
 import Lookup from '../screens/Lookup';
 import ScanConfirmation from '../screens/ScanConfirmation';
 import ScanResult from '../screens/ScanResult';
+import IngredientDetailed from '../screens/IngredientDetailed';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -14,6 +15,10 @@ export type RootStackParamList = {
   Lookup: undefined;
   ScanConfirmation: { scannedText: string } | undefined;
   ScanResult: { scannedText: string };
+  IngredientDetailed: {
+    name: string;
+    description: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -27,6 +32,11 @@ export function AppNavigator() {
         <Stack.Screen name="Lookup" component={Lookup} />
         <Stack.Screen name="ScanConfirmation" component={ScanConfirmation} />
         <Stack.Screen name="ScanResult" component={ScanResult} />
+        <Stack.Screen
+          name="IngredientDetailed"
+          component={IngredientDetailed}
+          options={{ title: 'Ingredient Details' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
