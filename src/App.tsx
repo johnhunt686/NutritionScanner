@@ -7,6 +7,7 @@ import {
   JosefinSans_700Bold,
 } from '@expo-google-fonts/josefin-sans';
 import SyncModal from './screens/SyncModal';
+import { theme } from './theme';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -18,12 +19,6 @@ export default function App() {
     return null; //maybe screen that looks like loading or smth
   }
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-  });
-
   return (
     <View style={styles.container}>
       <AppNavigator />
@@ -31,3 +26,10 @@ export default function App() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.semanticColors.theme.background,
+  },
+});

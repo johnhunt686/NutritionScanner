@@ -4,6 +4,9 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Fuse from 'fuse.js';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { IngredientResult } from '@/components/ui/IngredientResult';
+import { theme } from '../theme';
+
+const { semanticColors, radii, spacing, border, typography } = theme;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Lookup'>;
 
@@ -13,18 +16,18 @@ export default function Lookup({ navigation }: Props) {
   const exampleResults = [
     {
       id: 1,
-      name: 'The Spink',
-      description: 'Haha you cant click this for more information yet.',
+      name: 'Example Ingredient 1',
+      description: 'Example Ingredient 1 description.',
     },
     {
       id: 2,
-      name: 'Second Example Result',
-      description: 'Im the second Example result.',
+      name: 'Example Ingredient 2',
+      description: 'Example Ingredient  2 description.',
     },
     {
       id: 3,
-      name: 'Red 50',
-      description: 'Pen is fald off.',
+      name: 'Example Ingredient 3',
+      description: 'Example Ingredient 3 description.',
     },
   ];
 
@@ -41,6 +44,7 @@ export default function Lookup({ navigation }: Props) {
       <TextInput
         style={styles.searchBar}
         placeholder="Search..."
+        placeholderTextColor={semanticColors.theme.primaryAccent}
         value={search}
         onChangeText={setSearch}
       />
@@ -67,15 +71,17 @@ export default function Lookup({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
   },
   searchBar: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginVertical: 12,
-    fontSize: 16,
+    borderWidth: border.thin,
+    borderColor: semanticColors.theme.border,
+    borderRadius: radii.medium,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    marginVertical: spacing.md,
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.body,
   },
 });

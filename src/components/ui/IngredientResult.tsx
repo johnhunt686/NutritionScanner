@@ -1,5 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { theme } from '../../theme';
+
+const { semanticColors, spacing, border, typography } = theme;
 
 export interface IngredientResultProps {
   name: string;
@@ -22,16 +25,20 @@ export const IngredientResult: React.FC<IngredientResultProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    paddingVertical: spacing.md,
+    borderBottomWidth: border.thin,
+    borderBottomColor: semanticColors.theme.border,
   },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
   },
   description: {
-    marginTop: 4,
-    fontSize: 14,
+    marginTop: spacing.xs,
+    color: semanticColors.theme.primaryAccent,
+    fontSize: typography.fontSizes.small,
+    fontFamily: typography.fonts.body,
   },
 });

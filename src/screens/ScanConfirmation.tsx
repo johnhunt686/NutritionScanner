@@ -2,6 +2,9 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { theme } from '../theme';
+
+const { semanticColors, spacing, border, typography } = theme;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ScanConfirmation'>;
 
@@ -42,36 +45,42 @@ export default function ScanConfirmation({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
   },
 
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 16,
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.xlarge,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
+    marginVertical: spacing.md,
   },
 
   result: {
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-    marginBottom: 16,
+    paddingVertical: spacing.md,
+    borderBottomWidth: border.thin,
+    borderBottomColor: semanticColors.theme.border,
+    borderTopWidth: border.thin,
+    borderTopColor: semanticColors.theme.border,
+    marginBottom: spacing.md,
   },
 
   scannedText: {
-    fontSize: 16,
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.body,
   },
 
   button: {
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    paddingVertical: spacing.md,
+    borderBottomWidth: border.thin,
+    borderBottomColor: semanticColors.theme.border,
   },
 
   buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: semanticColors.theme.primary,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
   },
 });

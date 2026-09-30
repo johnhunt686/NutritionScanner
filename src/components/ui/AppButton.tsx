@@ -1,5 +1,8 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { theme } from '../../theme';
+
+const { semanticColors, radii, spacing, typography } = theme;
 
 type AppButtonProps = {
   label: string;
@@ -16,15 +19,16 @@ export function AppButton({ label, onPress }: AppButtonProps) {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#2563EB',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    backgroundColor: semanticColors.theme.primary,
+    borderRadius: radii.medium,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     alignItems: 'center',
   },
   label: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    color: semanticColors.theme.background,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
   },
 });

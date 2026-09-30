@@ -1,10 +1,8 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { theme } from '../../theme';
 
-// Assuming your constants are imported from a central theme file
-import { theme } from '@/theme';
-import { typography } from '@/theme/text';
-const { semanticColors, radii, spacing, border } = theme;
+const { semanticColors, radii, spacing, border, typography } = theme;
 
 export interface BareModalProps {
   visible: boolean;
@@ -67,6 +65,7 @@ export const CoolModal: React.FC<BareModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
+    backgroundColor: semanticColors.theme.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },

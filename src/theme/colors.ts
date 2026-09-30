@@ -20,6 +20,7 @@ export const semanticColors = {
     primaryAccent: palette.green150,
     secondaryAccent: palette.green250,
     border: palette.black,
+    overlay: 'rgba(13, 20, 0, 0.55)',
     alert: palette.red,
     notice: palette.yellow,
   },
