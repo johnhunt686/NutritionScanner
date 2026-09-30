@@ -1,17 +1,8 @@
 import React, { useRef, useState } from 'react';
 
-import {
-  CameraView,
-  useCameraPermissions,
-} from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-} from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -19,10 +10,7 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 
 import { NavButton } from '@/components/ui/NavButton';
 
-import {
-  recognize,
-  type OCRResult,
-} from 'react-native-nitro-ocr';
+import { recognize, type OCRResult } from 'react-native-nitro-ocr';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -54,11 +42,7 @@ export default function HomeScreen({ navigation }: Props) {
    * Start the 5-photo scan.
    */
   const startScan = async () => {
-    if (
-      scanningRef.current ||
-      !cameraReady ||
-      !cameraRef.current
-    ) {
+    if (scanningRef.current || !cameraReady || !cameraRef.current) {
       return;
     }
 
@@ -118,9 +102,7 @@ export default function HomeScreen({ navigation }: Props) {
       }
     } catch (scanError) {
       setError(
-        scanError instanceof Error
-          ? scanError.message
-          : 'Something went wrong while scanning.',
+        scanError instanceof Error ? scanError.message : 'Something went wrong while scanning.',
       );
     } finally {
       scanningRef.current = false;
@@ -135,17 +117,10 @@ export default function HomeScreen({ navigation }: Props) {
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>
-          We need your permission to show the camera
-        </Text>
+        <Text style={styles.message}>We need your permission to show the camera</Text>
 
-        <TouchableOpacity
-          style={styles.permissionButton}
-          onPress={requestPermission}
-        >
-          <Text style={styles.permissionText}>
-            Grant permission
-          </Text>
+        <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+          <Text style={styles.permissionText}>Grant permission</Text>
         </TouchableOpacity>
       </View>
     );
@@ -158,9 +133,7 @@ export default function HomeScreen({ navigation }: Props) {
         style={styles.camera}
         facing="back"
         onCameraReady={() => setCameraReady(true)}
-        onMountError={(mountError) =>
-          setError(mountError.message)
-        }
+        onMountError={(mountError) => setError(mountError.message)}
       />
 
       {/* Scan status */}
@@ -177,26 +150,18 @@ export default function HomeScreen({ navigation }: Props) {
       {/* Error */}
       {error && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText}>
-            {error}
-          </Text>
+          <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
 
       {/* Main scan button */}
       <TouchableOpacity
-        style={[
-          styles.scanButton,
-          (!cameraReady || isScanning) &&
-            styles.scanButtonDisabled,
-        ]}
+        style={[styles.scanButton, (!cameraReady || isScanning) && styles.scanButtonDisabled]}
         disabled={!cameraReady || isScanning}
         onPress={startScan}
       >
         <View style={styles.scanButtonInner}>
-          <Text style={styles.scanButtonText}>
-            {isScanning ? `${photoCount}/5` : 'SCAN'}
-          </Text>
+          <Text style={styles.scanButtonText}>{isScanning ? `${photoCount}/5` : 'SCAN'}</Text>
         </View>
       </TouchableOpacity>
 
@@ -216,9 +181,7 @@ export default function HomeScreen({ navigation }: Props) {
       <NavButton
         label="Confirm"
         style={styles.resultButton}
-        onPress={() =>
-          navigation.navigate('ScanConfirmation')
-        }
+        onPress={() => navigation.navigate('ScanConfirmation')}
       />
     </View>
   );
@@ -353,4 +316,3 @@ const styles = StyleSheet.create({
     right: 28,
   },
 });
-
