@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Fuse from 'fuse.js';
+import type { RootStackParamList } from '../navigation/AppNavigator';
+import { IngredientResult } from '@/components/ui/IngredientResult';
 
-export default function Lookup() {
+type Props = NativeStackScreenProps<RootStackParamList, 'Lookup'>;
+
+export default function Lookup({ navigation }: Props) {
   const [search, setSearch] = useState('');
 
   const exampleResults = [
@@ -42,10 +47,17 @@ export default function Lookup() {
 
       <ScrollView>
         {filteredResults.map((result) => (
-          <View key={result.id} style={styles.result}>
-            <Text style={styles.resultName}>{result.name}</Text>
-            <Text style={styles.resultDescription}>{result.description}</Text>
-          </View>
+          <IngredientResult
+            key={result.id}
+            name={result.name}
+            description={result.description}
+            onPress={() =>
+              navigation.navigate('IngredientDetailed', {
+                name: result.name,
+                description: result.description,
+              })
+            }
+          />
         ))}
       </ScrollView>
     </View>
@@ -65,18 +77,5 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginVertical: 12,
     fontSize: 16,
-  },
-  result: {
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  resultName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  resultDescription: {
-    marginTop: 4,
-    fontSize: 14,
   },
 });

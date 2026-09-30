@@ -2,10 +2,11 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { IngredientResult } from '@/components/ui/IngredientResult';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ScanResult'>;
 
-export default function ScanResult({ route }: Props) {
+export default function ScanResult({ route, navigation }: Props) {
   const scannedText = route.params?.scannedText;
 
   /* const exampleResults = [
@@ -44,11 +45,17 @@ export default function ScanResult({ route }: Props) {
 
       <ScrollView>
         {results.map((result) => (
-          <View key={result.id} style={styles.result}>
-            <Text style={styles.resultName}>{result.name}</Text>
-
-            <Text style={styles.resultDescription}>{result.description}</Text>
-          </View>
+          <IngredientResult
+            key={result.id}
+            name={result.name}
+            description={result.description}
+            onPress={() =>
+              navigation.navigate('IngredientDetailed', {
+                name: result.name,
+                description: result.description,
+              })
+            }
+          />
         ))}
       </ScrollView>
     </View>
@@ -76,21 +83,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 16,
     marginBottom: 8,
-  },
-
-  result: {
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-
-  resultName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-
-  resultDescription: {
-    marginTop: 4,
-    fontSize: 14,
   },
 });
