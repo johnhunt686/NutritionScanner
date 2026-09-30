@@ -36,15 +36,15 @@ function PreferenceRow({ label, value, onValueChange }: PreferenceRowProps) {
     <View style={styles.row}>
       <Text style={styles.label}>{label}</Text>
 
-        <Switch
-          value={value}
-          onValueChange={onValueChange}
-          trackColor={{
-            false: semanticColors.theme.secondaryAccent,
-            true: semanticColors.theme.secondary,
-          }}
-          thumbColor={semanticColors.theme.background}
-        />
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        trackColor={{
+          false: semanticColors.theme.secondaryAccent,
+          true: semanticColors.theme.secondary,
+        }}
+        thumbColor={semanticColors.theme.background}
+      />
     </View>
   );
 }
