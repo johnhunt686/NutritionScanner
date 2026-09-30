@@ -5,7 +5,7 @@ import { theme } from '../theme';
 const { semanticColors, spacing, border, typography } = theme;
 
 export default function Preferences() {
-  const [poopAllergy, setPoopAllergy] = useState(true);
+  const [Allergy, setAllergy] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [explode, setExplode] = useState(true);
   const [vibrations, setVibrations] = useState(false);
@@ -13,7 +13,7 @@ export default function Preferences() {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <PreferenceRow label="Poop Allergy" value={poopAllergy} onValueChange={setPoopAllergy} />
+        <PreferenceRow label="Allergy" value={Allergy} onValueChange={setAllergy} />
 
         <PreferenceRow label="Dark Mode" value={darkMode} onValueChange={setDarkMode} />
 

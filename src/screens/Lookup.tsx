@@ -16,18 +16,18 @@ export default function Lookup({ navigation }: Props) {
   const exampleResults = [
     {
       id: 1,
-      name: 'The Spink',
-      description: 'Haha you cant click this for more information yet.',
+      name: 'Example Ingredient 1',
+      description: 'Example Ingredient 1 description.',
     },
     {
       id: 2,
-      name: 'Second Example Result',
-      description: 'Im the second Example result.',
+      name: 'Example Ingredient 2',
+      description: 'Example Ingredient  2 description.',
     },
     {
       id: 3,
-      name: 'Red 50',
-      description: 'Pen is fald off.',
+      name: 'Example Ingredient 3',
+      description: 'Example Ingredient 3 description.',
     },
   ];
 

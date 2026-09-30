@@ -15,18 +15,18 @@ export default function ScanResult({ route, navigation }: Props) {
   /* const exampleResults = [
     {
       id: 1,
-      name: 'Asspertaain',
-      description: 'Still Cant Click',
+      name: 'Example Ingredient 1',
+      description: 'Example Ingredient 1 description.',
     },
     {
       id: 2,
-      name: 'Second Example Result',
-      description: 'This probably looks very familiar.',
+      name: 'Example Ingredient 2',
+      description: 'Example Ingredient 2 description.',
     },
     {
       id: 3,
-      name: 'Red 57',
-      description: 'Pen is fald off still.',
+      name: 'Example Ingredient 3',
+      description: 'Example Ingredient 3 description.',
     },
   ];*/
   const results = (scannedText ?? '')
