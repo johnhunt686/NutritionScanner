@@ -5,7 +5,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-
+import { Ionicons } from '@expo/vector-icons';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 import { NavButton } from '@/components/ui/NavButton';
@@ -157,6 +157,8 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
       )}
 
+      <View style={styles.bottomBar} />
+
       {/* Main scan button */}
       <TouchableOpacity
         style={[styles.scanButton, (!cameraReady || isScanning) && styles.scanButtonDisabled]}
@@ -164,28 +166,23 @@ export default function HomeScreen({ navigation }: Props) {
         onPress={startScan}
       >
         <View style={styles.scanButtonInner}>
-          <Text style={styles.scanButtonText}>{isScanning ? `${photoCount}/5` : 'SCAN'}</Text>
         </View>
       </TouchableOpacity>
 
       {/* Existing navigation buttons */}
-      <NavButton
-        label="Pref"
+      <TouchableOpacity
         style={styles.prefButton}
         onPress={() => navigation.navigate('Preferences')}
-      />
+      >
+        <Ionicons name="settings-outline" size={32} color="white" />
+      </TouchableOpacity>
 
-      <NavButton
-        label="Look"
+      <TouchableOpacity
         style={styles.lookupButton}
         onPress={() => navigation.navigate('Lookup')}
-      />
-
-      <NavButton
-        label="Confirm"
-        style={styles.resultButton}
-        onPress={() => navigation.navigate('ScanConfirmation')}
-      />
+      >
+        <Ionicons name="search-outline" size={28} color="white" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -220,9 +217,22 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeights.bold,
   },
 
-  /*
-   * Scan progress
-   */
+  bottomBar: {
+    position: 'absolute',
+    bottom: 55,
+    left: 40,
+    right: 40,
+    height: 100,
+
+    backgroundColor: 'white',
+    opacity: 0.4,
+
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+  },
+
   scanStatus: {
     position: 'absolute',
     top: 70,
@@ -265,39 +275,33 @@ const styles = StyleSheet.create({
    */
   scanButton: {
     position: 'absolute',
-    bottom: 35,
+    bottom: 60,
     alignSelf: 'center',
+    borderWidth: 2,
 
     width: 90,
-    height: 90,
-
+    aspectRatio: 1,
     borderRadius: 45,
+    opacity: 0.8,
 
-    backgroundColor: 'white',
+    backgroundColor: semanticColors.theme.background,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
 
     justifyContent: 'center',
     alignItems: 'center',
-
-    borderWidth: 5,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
   },
 
   scanButtonInner: {
     width: 70,
-    height: 70,
-
+    aspectRatio: 1,
     borderRadius: 35,
+    overflow: 'hidden',
+    opacity: 0.8,
 
-    backgroundColor: '#007AFF',
+    backgroundColor: semanticColors.theme.content,
 
     justifyContent: 'center',
     alignItems: 'center',
-  },
-
-  scanButtonText: {
-    color: 'white',
-    fontSize: 13,
-    fontWeight: '800',
   },
 
   scanButtonDisabled: {
@@ -308,17 +312,36 @@ const styles = StyleSheet.create({
    * Existing navigation buttons
    */
   prefButton: {
-    bottom: 60,
-    right: 30,
+    position: 'absolute',
+    bottom: 68,
+    right: 60,
+
+    width: 75,
+    height: 75,
+    borderRadius: 9999,
+
+    color: 'black',
+    backgroundColor: semanticColors.theme.background,
+    opacity: 0.6,
+
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   lookupButton: {
-    bottom: 130,
-    right: 28,
-  },
+    position: 'absolute',
+    bottom: 68,
+    left: 60,
 
-  resultButton: {
-    bottom: 200,
-    right: 28,
+    width: 75,
+    height: 75,
+    borderRadius: 9999,
+
+    color: 'black',
+    backgroundColor: semanticColors.theme.background,
+    opacity: 0.6,
+
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
