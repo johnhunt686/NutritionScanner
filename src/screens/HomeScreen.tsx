@@ -8,7 +8,6 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
-import { NavButton } from '@/components/ui/NavButton';
 import { theme } from '../theme';
 
 const { semanticColors, radii, spacing, typography } = theme;
@@ -165,8 +164,7 @@ export default function HomeScreen({ navigation }: Props) {
         disabled={!cameraReady || isScanning}
         onPress={startScan}
       >
-        <View style={styles.scanButtonInner}>
-        </View>
+        <View style={styles.scanButtonInner}></View>
       </TouchableOpacity>
 
       {/* Existing navigation buttons */}
@@ -177,10 +175,7 @@ export default function HomeScreen({ navigation }: Props) {
         <Ionicons name="settings-outline" size={32} color="white" />
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.lookupButton}
-        onPress={() => navigation.navigate('Lookup')}
-      >
+      <TouchableOpacity style={styles.lookupButton} onPress={() => navigation.navigate('Lookup')}>
         <Ionicons name="search-outline" size={28} color="white" />
       </TouchableOpacity>
     </View>
