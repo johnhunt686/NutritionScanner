@@ -8,7 +8,8 @@ const { semanticColors, spacing, border, typography, radii } = theme;
 
 export function PreferenceRow({ label, type, value, onValueChange, onDelete }: PreferenceRowProps) {
   const iconName = type === 'ingredient' ? 'nutrition-outline' : 'pricetag-outline';
-  const iconColor = type === 'ingredient' ? semanticColors.theme.primary : semanticColors.theme.secondary;
+  const iconColor =
+    type === 'ingredient' ? semanticColors.theme.primary : semanticColors.theme.secondary;
 
   return (
     <View style={styles.row}>
@@ -30,7 +31,11 @@ export function PreferenceRow({ label, type, value, onValueChange, onDelete }: P
           thumbColor={semanticColors.theme.background}
         />
 
-        <Pressable onPress={onDelete} style={styles.deleteButton} accessibilityLabel={`Delete ${label}`}>
+        <Pressable
+          onPress={onDelete}
+          style={styles.deleteButton}
+          accessibilityLabel={`Delete ${label}`}
+        >
           <Ionicons name="trash-outline" size={20} color={semanticColors.theme.alert} />
         </Pressable>
       </View>

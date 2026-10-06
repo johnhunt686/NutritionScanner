@@ -62,7 +62,9 @@ export default function Preferences() {
 
     setPreferences((current) =>
       current.map((preference) =>
-        preference.preferenceId === item.preferenceId ? { ...preference, alert: value } : preference,
+        preference.preferenceId === item.preferenceId
+          ? { ...preference, alert: value }
+          : preference,
       ),
     );
 
@@ -93,7 +95,9 @@ export default function Preferences() {
 
     try {
       await Promise.all(
-        selectedIngredientIds.map((ingredientId) => upsertPreference(true, ingredientId, undefined)),
+        selectedIngredientIds.map((ingredientId) =>
+          upsertPreference(true, ingredientId, undefined),
+        ),
       );
       setSelectedIngredientIds([]);
       setIngredientModalVisible(false);
