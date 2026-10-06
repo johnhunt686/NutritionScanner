@@ -19,23 +19,38 @@ export type NewIngredient = typeof ingredients.$inferInsert;
 // ==========================================
 // TAGS
 // ==========================================
-export const tags = sqliteTable(
-  'tags',
+export const tags = sqliteTable('tags', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  color: text('color'),
+});
+
+export type Tag = typeof tags.$inferSelect;
+export type NewTag = typeof tags.$inferInsert;
+
+// ==========================================
+// INGREDIENT TAGS (Junction Table)
+// ==========================================
+export const ingredientTags = sqliteTable(
+  'ingredient_tags',
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     ingredientId: integer('ingredient_id')
       .notNull()
       .references(() => ingredients.id, { onDelete: 'cascade' }),
-    name: text('name').notNull(),
-    color: text('color'),
+    tagId: integer('tag_id')
+      .notNull()
+      .references(() => tags.id, { onDelete: 'cascade' }),
   },
   (table) => ({
-    ingredientIdx: index('tags_ingredient_id_idx').on(table.ingredientId),
+    ingredientIdx: index('ingredient_tags_ingredient_id_idx').on(table.ingredientId),
+    tagIdx: index('ingredient_tags_tag_id_idx').on(table.tagId),
+    uniquePair: uniqueIndex('ingredient_tags_unique_idx').on(table.ingredientId, table.tagId),
   }),
 );
 
-export type Tag = typeof tags.$inferSelect;
-export type NewTag = typeof tags.$inferInsert;
+export type IngredientTag = typeof ingredientTags.$inferSelect;
+export type NewIngredientTag = typeof ingredientTags.$inferInsert;
 
 // ==========================================
 // DESCRIPTIONS
