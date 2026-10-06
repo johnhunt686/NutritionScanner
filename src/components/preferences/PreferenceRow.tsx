@@ -14,7 +14,7 @@ export function PreferenceRow({ label, type, value, onValueChange, onDelete }: P
     <View style={styles.row}>
       <View style={styles.leftContent}>
         <View style={[styles.typeBadge, { backgroundColor: `${iconColor}20` }]}>
-          <Ionicons name={iconName as any} size={18} color={iconColor} />
+          <Ionicons name={iconName} size={18} color={iconColor} />
         </View>
         <Text style={styles.label}>{label}</Text>
       </View>
