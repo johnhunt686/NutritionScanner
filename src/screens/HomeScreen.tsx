@@ -29,12 +29,7 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <CameraView style={styles.camera} facing={'back'} />
-      <CoolModal
-        visible={true}
-        headerText="headertext"
-        confirmText="confirmText"
-        denyText="denyText"
-      ></CoolModal>
+    
 
       {/* Fitted Vertical Cluster in Bottom-Right */}
       <View style={styles.buttonCluster}>

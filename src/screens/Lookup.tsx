@@ -1,11 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import Fuse from 'fuse.js';
+//import Fuse from 'fuse.js';
+import { useDatabase } from '../../db/useDatabase';
+
+type Result = {
+  id: number;
+  name: string;
+  description: string;
+};
 
 export default function Lookup() {
   const [search, setSearch] = useState('');
+  const [results, setResults] = useState<Result[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const exampleResults = [
+  const {
+    searchIngredientsByName,
+    getIngredientProfile,
+    getAllIngredients,
+  } = useDatabase();
+
+  useEffect(() => {
+    async function loadResults() {
+      setLoading(true);
+
+      try {
+        const ingredients = search.trim() === '' ? await getAllIngredients() : await searchIngredientsByName(search);
+        const databaseResults = await Promise.all(ingredients.map(async (ingredient) => {
+          const profile = await getIngredientProfile(ingredient.id);
+
+          return {
+            id: ingredient.id,
+            name: ingredient.commonName ?? ingredient.formalName,
+            description: profile?.descriptions[0]?.descriptionShort ?? 'No Description found',
+          };
+        }),);
+        setResults(databaseResults);
+      } catch (error) 
+      {
+        console.error('Failed to load results:', error);     
+        setResults([]);   
+      } finally
+      {
+        setLoading(false);
+      }
+    }
+    loadResults();
+  }, [
+    search,
+    searchIngredientsByName,
+    getIngredientProfile,
+    getAllIngredients,
+  ]);
+
+  /*const exampleResults = [
     {
       id: 1,
       name: 'The Spink',
@@ -29,7 +77,7 @@ export default function Lookup() {
   });
 
   const filteredResults =
-    search.trim() === '' ? exampleResults : fuse.search(search).map((result) => result.item);
+    search.trim() === '' ? exampleResults : fuse.search(search).map((result) => result.item); */
 
   return (
     <View style={styles.container}>
@@ -40,14 +88,20 @@ export default function Lookup() {
         onChangeText={setSearch}
       />
 
-      <ScrollView>
-        {filteredResults.map((result) => (
-          <View key={result.id} style={styles.result}>
-            <Text style={styles.resultName}>{result.name}</Text>
-            <Text style={styles.resultDescription}>{result.description}</Text>
-          </View>
-        ))}
-      </ScrollView>
+      {loading ? (
+        <Text>Loading results...</Text>
+      ) : (
+        <ScrollView>
+          {results.map((result) => (
+            <View key={result.id} style={styles.result}>
+              <Text style={styles.resultName}>{result.name}</Text>
+              <Text style={styles.resultDescription}>
+                {result.description}
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }

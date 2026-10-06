@@ -5,6 +5,7 @@ import {
   searchIngredientsWithTags,
   searchResearch,
   upsertPreference,
+  getAllIngredients,
 } from './queries';
 
 export function useDatabase() {
@@ -15,5 +16,6 @@ export function useDatabase() {
     searchResearch,
     upsertPreference,
     getPreferences,
+    getAllIngredients,
   };
 }
