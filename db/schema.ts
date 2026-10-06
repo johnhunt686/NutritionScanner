@@ -130,7 +130,9 @@ export const userSettings = sqliteTable('userSettings', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   settingKey: text('setting_key').notNull().unique(),
   settingValue: text('setting_value').notNull(),
-  updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
+  updatedAt: text('updated_at')
+    .notNull()
+    .default(sql`(datetime('now'))`),
 });
 
 export type UserSetting = typeof userSettings.$inferSelect;
