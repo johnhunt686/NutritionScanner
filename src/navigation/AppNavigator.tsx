@@ -8,6 +8,7 @@ import Lookup from '../screens/Lookup';
 import ScanConfirmation from '../screens/ScanConfirmation';
 import ScanResult from '../screens/ScanResult';
 import IngredientDetailed from '../screens/IngredientDetailed';
+import Settings from '../screens/Settings';
 import { theme } from '../theme';
 
 const { semanticColors, typography } = theme;
@@ -22,6 +23,7 @@ export type RootStackParamList = {
     name: string;
     description: string;
   };
+  Settings: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -46,6 +48,7 @@ export function AppNavigator() {
         <Stack.Screen name="Lookup" component={Lookup} />
         <Stack.Screen name="ScanConfirmation" component={ScanConfirmation} />
         <Stack.Screen name="ScanResult" component={ScanResult} />
+        <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen
           name="IngredientDetailed"
           component={IngredientDetailed}

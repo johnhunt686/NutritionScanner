@@ -124,6 +124,19 @@ export type Preference = typeof preferences.$inferSelect;
 export type NewPreference = typeof preferences.$inferInsert;
 
 // ==========================================
+// USER SETTINGS
+// ==========================================
+export const userSettings = sqliteTable('userSettings', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  settingKey: text('setting_key').notNull().unique(),
+  settingValue: text('setting_value').notNull(),
+  updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
+});
+
+export type UserSetting = typeof userSettings.$inferSelect;
+export type NewUserSetting = typeof userSettings.$inferInsert;
+
+// ==========================================
 // INGREDIENT RESEARCH (Junction Table)
 // ==========================================
 export const ingredientResearch = sqliteTable(
