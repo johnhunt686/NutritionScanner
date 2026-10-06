@@ -9,6 +9,7 @@ import {
   preferences,
   ingredientResearch,
   userSettings,
+  ingredientTags,
   Ingredient,
 } from './schema';
 
@@ -45,20 +46,18 @@ export async function searchIngredientsWithTags(searchTerm?: string, tagName?: s
     .from(ingredients)
     .$dynamic();
 
-  // Conditionally join tags if a tag search is requested
   if (tagName) {
-    query = query.innerJoin(tags, eq(tags.ingredientId, ingredients.id));
+    query = query
+      .innerJoin(ingredientTags, eq(ingredientTags.ingredientId, ingredients.id))
+      .innerJoin(tags, eq(tags.id, ingredientTags.tagId));
   }
 
   const conditions = [];
 
-  // Add tag filter
   if (tagName) {
     conditions.push(eq(tags.name, tagName));
   }
 
-  // Add name filter (Using standard LIKE here for combined dynamic queries,
-  // though you could swap this for an FTS join if full-text is strictly needed)
   if (searchTerm) {
     const term = `%${searchTerm}%`;
     conditions.push(
@@ -85,7 +84,15 @@ export async function getIngredientProfile(ingredientId: number) {
 
   // Run dependent queries concurrently for maximum speed
   const [ingTags, ingDescriptions, ingDeterminations, ingResearch] = await Promise.all([
-    db.select().from(tags).where(eq(tags.ingredientId, ingredientId)),
+    db
+      .select({
+        id: tags.id,
+        name: tags.name,
+        color: tags.color,
+      })
+      .from(ingredientTags)
+      .innerJoin(tags, eq(ingredientTags.tagId, tags.id))
+      .where(eq(ingredientTags.ingredientId, ingredientId)),
     db.select().from(descriptions).where(eq(descriptions.ingredientId, ingredientId)),
     db.select().from(determinations).where(eq(determinations.ingredientId, ingredientId)),
 
@@ -128,7 +135,8 @@ export async function searchResearch(options: {
     })
     .from(research)
     .leftJoin(ingredientResearch, eq(ingredientResearch.researchId, research.id))
-    .leftJoin(tags, eq(tags.ingredientId, ingredientResearch.ingredientId))
+    .leftJoin(ingredientTags, eq(ingredientTags.ingredientId, ingredientResearch.ingredientId))
+    .leftJoin(tags, eq(tags.id, ingredientTags.tagId))
     .$dynamic();
 
   const conditions = [];
@@ -142,7 +150,6 @@ export async function searchResearch(options: {
   }
 
   if (options.searchTerm) {
-    // Utilize the FTS virtual table for research summaries
     const term = `${options.searchTerm.trim()}*`;
     query = query.innerJoin(
       sql`research_fts`,
@@ -177,6 +184,40 @@ export async function upsertPreference(alert: boolean, ingredientId?: number, ta
       set: { alert },
     })
     .returning();
+}
+
+export async function getAllIngredients() {
+  return await db
+    .select({
+      id: ingredients.id,
+      formalName: ingredients.formalName,
+      commonName: ingredients.commonName,
+    })
+    .from(ingredients)
+    .orderBy(ingredients.formalName);
+}
+
+export async function getAllTags() {
+  return await db
+    .select({
+      id: tags.id,
+      name: tags.name,
+      color: tags.color,
+    })
+    .from(tags)
+    .orderBy(tags.name);
+}
+
+export async function deletePreference(ingredientId?: number, tagId?: number) {
+  if (!ingredientId && !tagId) throw new Error('Must provide either ingredientId or tagId');
+
+  let query = db.delete(preferences).where(eq(preferences.ingredientId, ingredientId ?? -1));
+
+  if (tagId) {
+    query = db.delete(preferences).where(eq(preferences.tagId, tagId));
+  }
+
+  return await query;
 }
 
 // ==========================================
