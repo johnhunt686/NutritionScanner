@@ -6,14 +6,14 @@ export const palette = {
   yellow: '#f1ae1e',
   red: '#cc3f14',
   white: '#e4ffd2',
-  offWhite: '#cffdc9',
+  offWhite: '#f1fff0',
   black: '#0d1400',
 } as const;
 
 export const semanticColors = {
   theme: {
     background: palette.white,
-    content: palette.offWhite,
+    content: '#d3f9c9',
     text: palette.black,
     primary: palette.green100,
     secondary: palette.green200,
