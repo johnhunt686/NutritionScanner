@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { AppButton } from '../components/ui/AppButton';
-import { SettingsHeader } from '../components/ui/SettingsHeader';
 import { Panel } from '../components/ui/SettingsPanel';
 import { SettingsToggleRow } from '../components/ui/SettingsToggleRow';
 import { getUserSettings, updateUserSetting } from '../../db/queries';
 import { theme } from '../theme';
 
-const { semanticColors, spacing } = theme;
+const { spacing } = theme;
 
 type ToggleSetting = {
   key: string;
@@ -76,17 +75,16 @@ export default function Settings() {
 
   return (
     <View style={styles.container}>
-      <SettingsHeader title="Settings" subtitle="Customize your app experience" />
-
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Panel>
-          {defaultSettings.map((setting) => (
+          {defaultSettings.map((setting, index) => (
             <SettingsToggleRow
               key={setting.key}
               label={setting.label}
               value={Boolean(settings[setting.key])}
               onValueChange={(value) => void handleToggle(setting.key, value)}
               disabled={loading}
+              showDivider={index < defaultSettings.length - 1}
             />
           ))}
         </Panel>
@@ -100,7 +98,7 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: semanticColors.theme.background,
+    backgroundColor: theme.colors.offWhite,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.xl,
     paddingBottom: spacing.lg,
