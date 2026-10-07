@@ -30,8 +30,8 @@ export default function ScanResult({ route, navigation }: Props) {
     },
   ];*/
   const results = (scannedText ?? '')
-  .replace(/^ingredients:\s*/i, '')  
-  .split(',')
+    .replace(/^ingredients:\s*/i, '')
+    .split(',')
     .map((segment, index) => ({
       id: index + 1,
       name: segment.trim(),

@@ -1,15 +1,11 @@
 import type { OCRResult } from 'react-native-nitro-ocr';
 
 const normalizeWord = (word: string): string =>
-  word
-    .toLowerCase()
-    .replace(/^[.,;:()[\]{}]+|[.,;:()[\]{}]+$/g, '');
+  word.toLowerCase().replace(/^[.,;:()[\]{}]+|[.,;:()[\]{}]+$/g, '');
 
 export const combineOcrResults = (results: OCRResult[]): string => {
   // Get the OCR text from every scan
-  const texts = results
-    .map((result) => result.text.trim())
-    .filter(Boolean);
+  const texts = results.map((result) => result.text.trim()).filter(Boolean);
 
   if (texts.length === 0) {
     return '';
@@ -20,7 +16,7 @@ export const combineOcrResults = (results: OCRResult[]): string => {
     text
       .split(/\s+/)
       .map((word) => word.trim())
-      .filter(Boolean)
+      .filter(Boolean),
   );
 
   // Start with the first scan
@@ -45,8 +41,7 @@ export const combineOcrResults = (results: OCRResult[]): string => {
       const currentStart = current.slice(0, overlap);
 
       const matches = mergedEnd.every(
-        (word, index) =>
-          normalizeWord(word) === normalizeWord(currentStart[index])
+        (word, index) => normalizeWord(word) === normalizeWord(currentStart[index]),
       );
 
       if (matches) {
@@ -63,10 +58,7 @@ export const combineOcrResults = (results: OCRResult[]): string => {
       const newWords = current.filter((word) => {
         const normalized = normalizeWord(word);
 
-        return !merged.some(
-          (existingWord) =>
-            normalizeWord(existingWord) === normalized
-        );
+        return !merged.some((existingWord) => normalizeWord(existingWord) === normalized);
       });
 
       merged.push(...newWords);
@@ -106,4 +98,3 @@ export const combineOcrResults = (results: OCRResult[]): string => {
   // Include the period itself.
   return fromIngredients.slice(0, periodIndex + 1).trim();
 };
-
