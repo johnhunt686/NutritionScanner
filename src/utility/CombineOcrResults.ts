@@ -20,7 +20,7 @@ export const combineOcrResults = (results: OCRResult[]): string => {
   );
 
   // Start with the first scan
-  let merged = [...sequences[0]];
+  const merged = [...sequences[0]];
 
   // Merge each additional scan
   for (let i = 1; i < sequences.length; i++) {
