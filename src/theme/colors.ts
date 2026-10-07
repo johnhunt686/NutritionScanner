@@ -8,7 +8,7 @@ export const palette = {
   white: '#e4ffd2',
   offWhite: '#f1fff0',
   black: '#0d1400',
-  brightGreen: '#d3f9c9'
+  brightGreen: '#d3f9c9',
 } as const;
 
 export const semanticColors = {
