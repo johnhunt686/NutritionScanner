@@ -139,6 +139,13 @@ export default function HomeScreen({ navigation }: Props) {
         onMountError={(mountError) => setError(mountError.message)}
       />
 
+      <TouchableOpacity
+        style={styles.settingsButton}
+        onPress={() => navigation.navigate('Settings')}
+      >
+        <Ionicons name="settings-outline" size={32} color="white" />
+      </TouchableOpacity>
+
       {/* Scan status */}
       {isScanning && (
         <View style={styles.scanStatus}>
@@ -311,6 +318,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 68,
     right: 60,
+
+    width: 75,
+    height: 75,
+    borderRadius: 9999,
+
+    color: 'black',
+    backgroundColor: semanticColors.theme.background,
+    opacity: 0.6,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  settingsButton: {
+    position: 'absolute',
+    top: 68,
+    right: 30,
 
     width: 75,
     height: 75,

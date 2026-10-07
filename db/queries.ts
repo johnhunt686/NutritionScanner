@@ -8,6 +8,7 @@ import {
   determinations,
   preferences,
   ingredientResearch,
+  userSettings,
   ingredientTags,
   Ingredient,
 } from './schema';
@@ -240,4 +241,85 @@ export async function getPreferences() {
     .from(preferences)
     .leftJoin(ingredients, eq(preferences.ingredientId, ingredients.id))
     .leftJoin(tags, eq(preferences.tagId, tags.id));
+}
+
+// ==========================================
+// 7. User Settings
+// ==========================================
+function serializeSettingValue(value: unknown): string {
+  return JSON.stringify(value);
+}
+
+function parseStoredSettingValue(value: string | null | undefined): unknown {
+  if (value === null || value === undefined) return null;
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
+export async function getUserSettings() {
+  const rows = await db
+    .select({
+      key: userSettings.settingKey,
+      value: userSettings.settingValue,
+      updatedAt: userSettings.updatedAt,
+    })
+    .from(userSettings)
+    .orderBy(userSettings.settingKey);
+
+  return rows.map((row) => ({
+    key: row.key,
+    value: parseStoredSettingValue(row.value),
+    updatedAt: row.updatedAt,
+  }));
+}
+
+export async function updateUserSetting(settingKey: string, value: unknown) {
+  const trimmedKey = settingKey.trim();
+
+  if (!trimmedKey) {
+    throw new Error('Setting key is required');
+  }
+
+  const serializedValue = serializeSettingValue(value);
+  const now = new Date().toISOString();
+
+  const [row] = await db
+    .insert(userSettings)
+    .values({
+      settingKey: trimmedKey,
+      settingValue: serializedValue,
+      updatedAt: now,
+    })
+    .onConflictDoUpdate({
+      target: userSettings.settingKey,
+      set: {
+        settingValue: serializedValue,
+        updatedAt: now,
+      },
+    })
+    .returning({
+      id: userSettings.id,
+      key: userSettings.settingKey,
+      value: userSettings.settingValue,
+      updatedAt: userSettings.updatedAt,
+    });
+
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    key: row.key,
+    value: parseStoredSettingValue(row.value),
+    updatedAt: row.updatedAt,
+  };
+}
+
+export async function upsertUserSetting(settingKey: string, value: unknown) {
+  return updateUserSetting(settingKey, value);
 }

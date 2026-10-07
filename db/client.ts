@@ -177,4 +177,13 @@ expoDb.execSync(`
   END;
 `);
 
+expoDb.execSync(`
+  CREATE TABLE IF NOT EXISTS userSettings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    setting_key TEXT NOT NULL UNIQUE,
+    setting_value TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
 export const db = drizzle(expoDb, { schema });
