@@ -13,7 +13,7 @@ import { theme } from '../theme';
 const { semanticColors, radii, spacing, typography } = theme;
 
 import { recognize, type OCRResult } from 'react-native-nitro-ocr';
-
+import { combineOcrResults } from '../utility/CombineOcrResults';
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const TOTAL_PHOTOS = 5;
@@ -100,7 +100,8 @@ export default function HomeScreen({ navigation }: Props) {
        * Make sure we actually finished all 5 pictures.
        */
       if (results.length === TOTAL_PHOTOS) {
-        navigation.navigate('ScanConfirmation');
+        const combinedText = combineOcrResults(results);
+        navigation.navigate('ScanConfirmation', { scannedText: combinedText });
       }
     } catch (scanError) {
       setError(
