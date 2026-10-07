@@ -34,10 +34,7 @@ export function AppNavigator() {
         screenOptions={{
           contentStyle: { backgroundColor: theme.colors.offWhite },
           header: ({ navigation, options, route }) => (
-            <AppHeader
-              title={options.title ?? route.name}
-              onBack={() => navigation.goBack()}
-            />
+            <AppHeader title={options.title ?? route.name} onBack={() => navigation.goBack()} />
           ),
         }}
       >

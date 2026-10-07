@@ -21,11 +21,7 @@ export function AppHeader({ title, onBack }: AppHeaderProps) {
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <Ionicons
-            name="chevron-back"
-            size={26}
-            color={semanticColors.theme.primaryAccent}
-          />
+          <Ionicons name="chevron-back" size={26} color={semanticColors.theme.primaryAccent} />
         </TouchableOpacity>
 
         <Text style={styles.title} numberOfLines={1}>
