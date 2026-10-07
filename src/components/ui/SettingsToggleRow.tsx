@@ -9,6 +9,7 @@ type SettingsToggleRowProps = {
   value: boolean;
   onValueChange: (value: boolean) => void;
   disabled?: boolean;
+  showDivider?: boolean;
 };
 
 export function SettingsToggleRow({
@@ -16,9 +17,10 @@ export function SettingsToggleRow({
   value,
   onValueChange,
   disabled = false,
+  showDivider = true,
 }: SettingsToggleRowProps) {
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, !showDivider && styles.withoutDivider]}>
       <Text style={styles.label}>{label}</Text>
 
       <Switch
@@ -44,6 +46,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: border.thin,
     borderBottomColor: semanticColors.theme.border,
     minHeight: 56,
+  },
+  withoutDivider: {
+    borderBottomWidth: 0,
   },
   label: {
     color: semanticColors.theme.text,
