@@ -72,8 +72,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: spacing.md,
+    backgroundColor: theme.colors.offWhite,
   },
   searchBar: {
+    backgroundColor: theme.colors.offWhite,
     borderWidth: border.thin,
     borderColor: semanticColors.theme.border,
     borderRadius: radii.medium,
