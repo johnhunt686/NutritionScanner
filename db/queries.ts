@@ -26,7 +26,11 @@ export async function searchIngredientsByName(searchTerm: string): Promise<Ingre
 
   return await db.all<Ingredient>(
     sql`
-      SELECT i.*
+      SELECT
+        i.id AS id,
+        i.formal_name AS "formalName",
+        i.common_name AS "commonName",
+        i.last_updated AS "lastUpdated"
       FROM ingredients i
       JOIN ingredients_fts fts ON i.id = fts.rowid
       WHERE ingredients_fts MATCH ${formattedQuery}

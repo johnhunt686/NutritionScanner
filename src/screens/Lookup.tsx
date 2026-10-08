@@ -52,32 +52,6 @@ export default function Lookup({ navigation }: Props) {
     loadResults();
   }, [search, searchIngredientsByName, getIngredientProfile, getAllIngredients]);
 
-  /*const exampleResults = [
-    {
-      id: 1,
-      name: 'Example Ingredient 1',
-      description: 'Example Ingredient 1 description.',
-    },
-    {
-      id: 2,
-      name: 'Example Ingredient 2',
-      description: 'Example Ingredient  2 description.',
-    },
-    {
-      id: 3,
-      name: 'Example Ingredient 3',
-      description: 'Example Ingredient 3 description.',
-    },
-  ];
-
-  const fuse = new Fuse(exampleResults, {
-    keys: ['name', 'description'],
-    threshold: 0.4,
-  });
-
-  const filteredResults =
-    search.trim() === '' ? exampleResults : fuse.search(search).map((result) => result.item); */
-
   return (
     <View style={styles.container}>
       <TextInput

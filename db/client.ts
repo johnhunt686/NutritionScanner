@@ -4,9 +4,6 @@ import * as schema from './schema';
 
 const expoDb = openDatabaseSync('nutrition.db', { enableChangeListener: true });
 
-//For somereason the db doesnt work if there isnt a log here if you know why you should fix.
-console.log('[DB] nutrition.db opened');
-
 // Enable PRAGMAs
 expoDb.execSync('PRAGMA journal_mode = WAL;');
 expoDb.execSync('PRAGMA foreign_keys = ON;');
