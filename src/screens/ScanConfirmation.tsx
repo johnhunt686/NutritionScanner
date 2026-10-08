@@ -11,7 +11,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ScanConfirmation'>;
 export default function ScanConfirmation({ route, navigation }: Props) {
   const scannedText =
     route.params?.scannedText ??
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vel arcu commodo, tincidunt tellus ut, volutpat ex. Nam et massa ullamcorper, bibendum tortor eu, egestas massa';
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, Ut vel arcu commodo, tincidunt tellus ut, volutpat ex, Nam et massa ullamcorper, bibendum tortor eu, egestas massa.';
 
   const confirmScan = () => {
     navigation.navigate('ScanResult', {

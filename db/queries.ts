@@ -17,13 +17,20 @@ import {
 // 1. Search by Ingredient Name (FTS)
 // ==========================================
 export async function searchIngredientsByName(searchTerm: string): Promise<Ingredient[]> {
-  if (!searchTerm.trim()) return [];
-  const formattedQuery = `${searchTerm.trim()}*`;
+  const trimmedTerm = searchTerm.trim();
 
-  // Raw SQL is best here to leverage SQLite's FTS virtual tables and rank scoring
+  if (!trimmedTerm) return [];
+
+  const escapedTerm = trimmedTerm.replace(/"/g, '""');
+  const formattedQuery = `"${escapedTerm}"*`;
+
   return await db.all<Ingredient>(
     sql`
-      SELECT i.* 
+      SELECT
+        i.id AS id,
+        i.formal_name AS "formalName",
+        i.common_name AS "commonName",
+        i.last_updated AS "lastUpdated"
       FROM ingredients i
       JOIN ingredients_fts fts ON i.id = fts.rowid
       WHERE ingredients_fts MATCH ${formattedQuery}
