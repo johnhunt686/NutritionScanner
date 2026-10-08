@@ -8,8 +8,11 @@ import {
 } from '@expo-google-fonts/josefin-sans';
 import SyncModal from './screens/SyncModal';
 import { theme } from './theme';
+import { db } from '../db/client';
 
 export default function App() {
+  //declare database to force initialize
+  db;
   const [fontsLoaded] = useFonts({
     JosefinRegular: JosefinSans_400Regular,
     JosefinBold: JosefinSans_700Bold,

@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Fuse from 'fuse.js';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { IngredientResult } from '@/components/ui/IngredientResult';
 import { theme } from '../theme';
+import { useDatabase } from '../../db/useDatabase';
+
+type Result = {
+  id: number;
+  name: string;
+  description: string;
+};
 
 const { semanticColors, radii, spacing, border, typography } = theme;
 
@@ -12,32 +18,39 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Lookup'>;
 
 export default function Lookup({ navigation }: Props) {
   const [search, setSearch] = useState('');
+  const [results, setResults] = useState<Result[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const exampleResults = [
-    {
-      id: 1,
-      name: 'Example Ingredient 1',
-      description: 'Example Ingredient 1 description.',
-    },
-    {
-      id: 2,
-      name: 'Example Ingredient 2',
-      description: 'Example Ingredient  2 description.',
-    },
-    {
-      id: 3,
-      name: 'Example Ingredient 3',
-      description: 'Example Ingredient 3 description.',
-    },
-  ];
+  const { searchIngredientsByName, getIngredientProfile, getAllIngredients } = useDatabase();
 
-  const fuse = new Fuse(exampleResults, {
-    keys: ['name', 'description'],
-    threshold: 0.4,
-  });
+  useEffect(() => {
+    async function loadResults() {
+      setLoading(true);
 
-  const filteredResults =
-    search.trim() === '' ? exampleResults : fuse.search(search).map((result) => result.item);
+      try {
+        const ingredients =
+          search.trim() === '' ? await getAllIngredients() : await searchIngredientsByName(search);
+        const databaseResults = await Promise.all(
+          ingredients.map(async (ingredient) => {
+            const profile = await getIngredientProfile(ingredient.id);
+
+            return {
+              id: ingredient.id,
+              name: ingredient.commonName ?? ingredient.formalName,
+              description: profile?.descriptions[0]?.descriptionShort ?? 'No Description found',
+            };
+          }),
+        );
+        setResults(databaseResults);
+      } catch (error) {
+        console.error('Failed to load results:', error);
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadResults();
+  }, [search, searchIngredientsByName, getIngredientProfile, getAllIngredients]);
 
   return (
     <View style={styles.container}>
@@ -49,21 +62,25 @@ export default function Lookup({ navigation }: Props) {
         onChangeText={setSearch}
       />
 
-      <ScrollView>
-        {filteredResults.map((result) => (
-          <IngredientResult
-            key={result.id}
-            name={result.name}
-            description={result.description}
-            onPress={() =>
-              navigation.navigate('IngredientDetailed', {
-                name: result.name,
-                description: result.description,
-              })
-            }
-          />
-        ))}
-      </ScrollView>
+      {loading ? (
+        <Text>Loading results...</Text>
+      ) : (
+        <ScrollView>
+          {results.map((result) => (
+            <IngredientResult
+              key={result.id}
+              name={result.name}
+              description={result.description}
+              onPress={() =>
+                navigation.navigate('IngredientDetailed', {
+                  name: result.name,
+                  description: result.description,
+                })
+              }
+            />
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
