@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import pg from 'pg';
+import { startAdminServer } from './admin.js';
 
 const { Pool } = pg;
 
@@ -65,3 +66,4 @@ app.get('/sync', async (req, res) => {
 });
 
 app.listen(3000, '0.0.0.0', () => console.log('API on :3000'));
+startAdminServer(pool);
