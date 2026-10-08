@@ -305,7 +305,7 @@ export async function startAdminServer(pool) {
     });
   });
 
-  admin.use((error, _request, response, _next) => {
+  admin.use((error, _request, response) => {
     const statusCode = error.statusCode ?? (error instanceof multer.MulterError ? 413 : 500);
     if (statusCode >= 500) console.error(error);
     response.status(statusCode).json({ error: error.message || 'Admin request failed.' });
