@@ -11,9 +11,10 @@ relog to apply changes
 
 **Windows**
 You will need to install Docker Desktop [https://docs.docker.com/desktop/setup/install/windows-install/].
-Just follow the instructions it provides after opening the app. 
+Just follow the instructions it provides after opening the app.
 
 ### Running Containers
+
 Open the docker-compose.yml and click "Run All Services".
 ![alt text](https://media.discordapp.net/attachments/809126422698000434/1557908850395324457/image.png?ex=6ac9832e&is=6ac831ae&hm=9f52828754b37dfda5ec24af5f9bbfbc1f8879f2e2966c9ead9a713aefb0ac56&=&format=webp&quality=lossless)
 
@@ -35,7 +36,7 @@ you will also need to configure .env files for the main project and the backend
 #### ./.env
 
 EXPO_PUBLIC_API_URL=http://127.0.0.1:3000 # for actual device
-EXPO_PUBLIC_API_URL=http://10.0.2.2:3000  # for simulator
+EXPO_PUBLIC_API_URL=http://10.0.2.2:3000 # for simulator
 
 #### ./backend/.env
 
