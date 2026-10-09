@@ -2,7 +2,7 @@ import { openDatabaseSync } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as schema from './schema';
 
-const expoDb = openDatabaseSync('nutrition.db', { enableChangeListener: true });
+export const expoDb = openDatabaseSync('nutrition.db', { enableChangeListener: true });
 
 // Enable PRAGMAs
 expoDb.execSync('PRAGMA journal_mode = WAL;');

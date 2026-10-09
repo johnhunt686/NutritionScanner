@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   AppState,
   AppStateStatus,
   Modal,
@@ -8,18 +9,39 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { syncReferenceData } from '../utils/remoteSync';
 import { theme } from '../theme';
 
 const { semanticColors, radii, spacing, border, typography } = theme;
 
 export default function SyncModal() {
   const [visible, setVisible] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const appState = useRef<AppStateStatus>(AppState.currentState);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    setSyncResult(null);
+    setSyncError(null);
+
+    try {
+      const result = await syncReferenceData();
+      setSyncResult(`Updated ${result.ingredients} ingredients and ${result.tags} tags.`);
+    } catch (error) {
+      setSyncError(error instanceof Error ? error.message : 'Unable to sync database.');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextState) => {
       if (appState.current.match(/inactive|background/) && nextState === 'active') {
+        setSyncResult(null);
+        setSyncError(null);
         setVisible(true);
       }
 
@@ -41,10 +63,27 @@ export default function SyncModal() {
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.title}>Sync Database</Text>
+          <Text style={styles.message}>Download the latest ingredient and research data.</Text>
+          {syncing && <ActivityIndicator color={semanticColors.theme.primary} />}
+          {syncResult && <Text style={styles.status}>{syncResult}</Text>}
+          {syncError && <Text style={styles.error}>{syncError}</Text>}
 
-          <TouchableOpacity style={styles.button} onPress={() => setVisible(false)}>
-            <Text style={styles.buttonText}>Agree</Text>
-          </TouchableOpacity>
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.button}
+              disabled={syncing}
+              onPress={syncResult ? () => setVisible(false) : handleSync}
+            >
+              <Text style={styles.buttonText}>
+                {syncing ? 'Syncing...' : syncResult ? 'Done' : 'Check in'}
+              </Text>
+            </TouchableOpacity>
+            {!syncResult && (
+              <TouchableOpacity disabled={syncing} onPress={() => setVisible(false)}>
+                <Text style={styles.dismissText}>Not now</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
     </Modal>
@@ -57,6 +96,35 @@ const styles = StyleSheet.create({
     backgroundColor: semanticColors.theme.overlay,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  message: {
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.medium,
+    fontFamily: typography.fonts.body,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+
+  status: {
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.small,
+    fontFamily: typography.fonts.body,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+
+  error: {
+    color: semanticColors.theme.notice,
+    fontSize: typography.fontSizes.small,
+    fontFamily: typography.fonts.body,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+
+  actions: {
+    alignItems: 'center',
+    gap: spacing.sm,
   },
 
   modal: {
@@ -90,5 +158,12 @@ const styles = StyleSheet.create({
     color: semanticColors.theme.background,
     fontSize: typography.fontSizes.medium,
     fontFamily: typography.fonts.heading,
+  },
+
+  dismissText: {
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.small,
+    fontFamily: typography.fonts.body,
+    padding: spacing.xs,
   },
 });
