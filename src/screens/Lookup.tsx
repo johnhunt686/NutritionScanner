@@ -73,8 +73,7 @@ export default function Lookup({ navigation }: Props) {
               description={result.description}
               onPress={() =>
                 navigation.navigate('IngredientDetailed', {
-                  name: result.name,
-                  description: result.description,
+                  ingredientId: result.id,
                 })
               }
             />

@@ -21,8 +21,7 @@ export type RootStackParamList = {
   ScanConfirmation: { scannedText: string } | undefined;
   ScanResult: { scannedText: string };
   IngredientDetailed: {
-    name: string;
-    description: string;
+    ingredientId: number;
   };
   Settings: undefined;
 };
