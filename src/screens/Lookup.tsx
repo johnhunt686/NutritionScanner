@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import type { RootStackParamList } from '../navigation/AppNavigator';
-import { IngredientResult } from '@/components/ui/IngredientResult';
+import { IngredientResult, type IngredientResultTag } from '@/components/ui/IngredientResult';
 import { theme } from '../theme';
 import { useDatabase } from '../../db/useDatabase';
 
@@ -10,6 +19,7 @@ type Result = {
   id: number;
   name: string;
   description: string;
+  tags: IngredientResultTag[];
 };
 
 const { semanticColors, radii, spacing, border, typography } = theme;
@@ -19,7 +29,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Lookup'>;
 export default function Lookup({ navigation }: Props) {
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<Result[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { searchIngredientsByName, getIngredientProfile, getAllIngredients } = useDatabase();
 
@@ -38,6 +48,7 @@ export default function Lookup({ navigation }: Props) {
               id: ingredient.id,
               name: ingredient.commonName ?? ingredient.formalName,
               description: profile?.descriptions[0]?.descriptionShort ?? 'No Description found',
+              tags: profile?.tags ?? [],
             };
           }),
         );
@@ -54,23 +65,63 @@ export default function Lookup({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search..."
-        placeholderTextColor={semanticColors.theme.primaryAccent}
-        value={search}
-        onChangeText={setSearch}
-      />
+      <View style={styles.searchSection}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search-outline" size={20} color={semanticColors.theme.primary} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search ingredients"
+            placeholderTextColor={semanticColors.theme.primaryAccent}
+            value={search}
+            onChangeText={setSearch}
+            returnKeyType="search"
+            accessibilityLabel="Search ingredients"
+          />
+          {search.length > 0 && (
+            <Pressable
+              style={({ pressed }) => [styles.clearButton, pressed && styles.clearButtonPressed]}
+              onPress={() => setSearch('')}
+              accessibilityRole="button"
+              accessibilityLabel="Clear search"
+              hitSlop={8}
+            >
+              <Ionicons name="close" size={18} color={semanticColors.theme.primaryAccent} />
+            </Pressable>
+          )}
+        </View>
+
+        {!loading && results.length > 0 && (
+          <Text style={styles.resultCount}>
+            {results.length} {results.length === 1 ? 'result' : 'results'}
+          </Text>
+        )}
+      </View>
 
       {loading ? (
-        <Text>Loading results...</Text>
+        <View style={styles.centeredState}>
+          <ActivityIndicator color={semanticColors.theme.primary} />
+          <Text style={styles.stateText}>Loading ingredients...</Text>
+        </View>
+      ) : results.length === 0 ? (
+        <View style={styles.centeredState}>
+          <View style={styles.emptyIcon}>
+            <Ionicons name="search-outline" size={28} color={semanticColors.theme.primary} />
+          </View>
+          <Text style={styles.emptyTitle}>No ingredients found</Text>
+          <Text style={styles.stateText}>
+            {search.trim()
+              ? 'Try another name or a broader search.'
+              : 'No ingredients are available yet.'}
+          </Text>
+        </View>
       ) : (
-        <ScrollView>
+        <ScrollView contentContainerStyle={styles.resultsList} keyboardShouldPersistTaps="handled">
           {results.map((result) => (
             <IngredientResult
               key={result.id}
               name={result.name}
               description={result.description}
+              tags={result.tags}
               onPress={() =>
                 navigation.navigate('IngredientDetailed', {
                   ingredientId: result.id,
@@ -90,16 +141,77 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     backgroundColor: theme.colors.offWhite,
   },
+  searchSection: {
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+  },
   searchBar: {
-    backgroundColor: theme.colors.offWhite,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: semanticColors.theme.content,
     borderWidth: border.thin,
-    borderColor: semanticColors.theme.border,
-    borderRadius: radii.medium,
-    paddingHorizontal: spacing.sm,
+    borderColor: `${semanticColors.theme.primary}35`,
+    borderRadius: radii.large,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
     paddingVertical: spacing.sm,
-    marginVertical: spacing.md,
     color: semanticColors.theme.text,
     fontSize: typography.fontSizes.medium,
     fontFamily: typography.fonts.body,
+  },
+  clearButton: {
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.offWhite,
+    borderRadius: radii.full,
+  },
+  clearButtonPressed: {
+    opacity: 0.65,
+  },
+  resultCount: {
+    marginTop: spacing.sm,
+    color: semanticColors.theme.primaryAccent,
+    fontSize: typography.fontSizes.small,
+    fontFamily: typography.fonts.body,
+  },
+  resultsList: {
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.lg,
+  },
+  centeredState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
+  },
+  emptyIcon: {
+    width: 52,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+    backgroundColor: semanticColors.theme.content,
+    borderRadius: radii.full,
+  },
+  emptyTitle: {
+    marginBottom: spacing.xs,
+    color: semanticColors.theme.text,
+    fontSize: typography.fontSizes.large,
+    fontFamily: typography.fonts.heading,
+    fontWeight: typography.fontWeights.bold,
+  },
+  stateText: {
+    marginTop: spacing.sm,
+    color: semanticColors.theme.primaryAccent,
+    fontSize: typography.fontSizes.small,
+    fontFamily: typography.fonts.body,
+    textAlign: 'center',
   },
 });
