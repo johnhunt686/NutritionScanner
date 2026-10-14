@@ -80,21 +80,24 @@ export const combineOcrResults = (results: OCRResult[]): string => {
 
   // Start exactly at "Ingredients"
   const startIndex = ingredientsMatch.index;
-
   const fromIngredients = combinedText.slice(startIndex);
 
   // --------------------------------------------------
-  // Find the first period after "Ingredients"
+  // Find the first newline after "Ingredients"
   // --------------------------------------------------
 
-  const periodIndex = fromIngredients.indexOf('.');
+  const newlineIndex = fromIngredients.search(/[\r\n]/);
 
-  if (periodIndex === -1) {
-    // No period was detected, so return everything
-    // starting at Ingredients.
-    return fromIngredients.trim();
-  }
+  // Extract text up to the newline, or use all remaining text
+  // if no newline was detected.
+  const ingredientText = fromIngredients.slice(0, newlineIndex === -1 ? undefined : newlineIndex);
 
-  // Include the period itself.
-  return fromIngredients.slice(0, periodIndex + 1).trim();
+  // --------------------------------------------------
+  // Remove ingredient separators except commas
+  // --------------------------------------------------
+
+  return ingredientText
+    .replace(/[.;:•·]+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 };
