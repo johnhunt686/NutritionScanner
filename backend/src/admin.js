@@ -34,6 +34,11 @@ function parseRecordId(value, recordName) {
   return id;
 }
 
+async function ensureIngredientExists(pool, ingredientId) {
+  const result = await pool.query('SELECT id FROM ingredients WHERE id = $1', [ingredientId]);
+  if (!result.rowCount) throw badRequest('Ingredient not found.', 404);
+}
+
 function parseIngredientIds(value) {
   let ids;
   try {
@@ -86,7 +91,7 @@ export async function startAdminServer(pool) {
   admin.use(express.static(path.resolve(currentDirectory, '../public')));
 
   admin.get('/api/catalog', async (_request, response) => {
-    const [ingredients, tags, research] = await Promise.all([
+    const [ingredients, tags, research, descriptions, determinations] = await Promise.all([
       pool.query(`
         SELECT i.id, i.formal_name, i.common_name,
           COALESCE(array_agg(t.name ORDER BY t.name)
@@ -98,9 +103,12 @@ export async function startAdminServer(pool) {
         ORDER BY i.formal_name
       `),
       pool.query(`
-        SELECT t.id, t.name, t.color, COUNT(it.ingredient_id)::int AS ingredient_count
+        SELECT t.id, t.name, t.color, COUNT(it.ingredient_id)::int AS ingredient_count,
+          COALESCE(array_agg(i.formal_name ORDER BY i.formal_name)
+            FILTER (WHERE i.id IS NOT NULL), '{}') AS ingredient_names
         FROM tags t
         LEFT JOIN ingredient_tags it ON it.tag_id = t.id
+        LEFT JOIN ingredients i ON i.id = it.ingredient_id
         GROUP BY t.id
         ORDER BY t.name
       `),
@@ -119,7 +127,20 @@ export async function startAdminServer(pool) {
         LEFT JOIN ingredients i ON i.id = ir.ingredient_id
         GROUP BY r.id
         ORDER BY r.id DESC
-        LIMIT 30
+      `),
+      pool.query(`
+        SELECT d.id, d.ingredient_id, d.description_short, d.description_long,
+          i.formal_name AS ingredient_name
+        FROM descriptions d
+        JOIN ingredients i ON i.id = d.ingredient_id
+        ORDER BY i.formal_name, d.id DESC
+      `),
+      pool.query(`
+        SELECT d.id, d.ingredient_id, d.confidence, d.text,
+          i.formal_name AS ingredient_name
+        FROM determinations d
+        JOIN ingredients i ON i.id = d.ingredient_id
+        ORDER BY i.formal_name, d.id DESC
       `),
     ]);
 
@@ -127,15 +148,28 @@ export async function startAdminServer(pool) {
       ingredients: ingredients.rows,
       tags: tags.rows,
       research: research.rows,
+      descriptions: descriptions.rows,
+      determinations: determinations.rows,
     });
   });
 
   admin.post('/api/tags', async (request, response) => {
     const name = String(request.body.name ?? '').trim();
     const color = request.body.color || null;
+    const ingredientIds = parseIds(request.body.ingredientIds ?? [], 'Ingredients');
     if (!name || name.length > 80) throw badRequest('Tag name is required (80 characters max).');
     if (color !== null && !/^#[0-9a-f]{6}$/i.test(color)) {
       throw badRequest('Choose a valid tag color.');
+    }
+
+    if (ingredientIds.length) {
+      const { rowCount } = await pool.query(
+        'SELECT id FROM ingredients WHERE id = ANY($1::int[])',
+        [ingredientIds],
+      );
+      if (rowCount !== ingredientIds.length) {
+        throw badRequest('One or more selected ingredients no longer exist.');
+      }
     }
 
     const existing = await pool.query(
@@ -143,15 +177,46 @@ export async function startAdminServer(pool) {
       [name],
     );
     if (existing.rowCount) {
-      response.json({ tag: existing.rows[0], created: false });
+      for (const ingredientId of ingredientIds) {
+        await pool.query(
+          `INSERT INTO ingredient_tags (ingredient_id, tag_id) VALUES ($1, $2)
+           ON CONFLICT (ingredient_id, tag_id) DO NOTHING`,
+          [ingredientId, existing.rows[0].id],
+        );
+      }
+      response.json({
+        tag: existing.rows[0],
+        created: false,
+        linkedIngredients: ingredientIds.length,
+      });
       return;
     }
 
-    const result = await pool.query(
-      'INSERT INTO tags (name, color) VALUES ($1, $2) RETURNING id, name, color',
-      [name, color],
-    );
-    response.status(201).json({ tag: result.rows[0], created: true });
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const result = await client.query(
+        'INSERT INTO tags (name, color) VALUES ($1, $2) RETURNING id, name, color',
+        [name, color],
+      );
+      for (const ingredientId of ingredientIds) {
+        await client.query('INSERT INTO ingredient_tags (ingredient_id, tag_id) VALUES ($1, $2)', [
+          ingredientId,
+          result.rows[0].id,
+        ]);
+      }
+      await client.query('COMMIT');
+      response.status(201).json({
+        tag: result.rows[0],
+        created: true,
+        linkedIngredients: ingredientIds.length,
+      });
+    } catch (error) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw error;
+    } finally {
+      client.release();
+    }
   });
 
   admin.delete('/api/tags/:id', async (request, response) => {
@@ -213,6 +278,50 @@ export async function startAdminServer(pool) {
     );
     if (!result.rowCount) throw badRequest('Ingredient not found.', 404);
     response.json({ deleted: result.rows[0] });
+  });
+
+  admin.post('/api/descriptions', async (request, response) => {
+    const ingredientId = parseRecordId(request.body.ingredientId, 'ingredient');
+    const descriptionShort = String(request.body.descriptionShort ?? '').trim() || null;
+    const descriptionLong = String(request.body.descriptionLong ?? '').trim() || null;
+    await ensureIngredientExists(pool, ingredientId);
+    if (!descriptionShort && !descriptionLong) {
+      throw badRequest('Enter a short or long description.');
+    }
+    if (descriptionShort?.length > 1000 || descriptionLong?.length > 10000) {
+      throw badRequest(
+        'Short descriptions are limited to 1000 characters and long descriptions to 10000.',
+      );
+    }
+
+    const result = await pool.query(
+      `INSERT INTO descriptions (ingredient_id, description_short, description_long)
+       VALUES ($1, $2, $3)
+       RETURNING id, ingredient_id, description_short, description_long`,
+      [ingredientId, descriptionShort, descriptionLong],
+    );
+    response.status(201).json({ description: result.rows[0] });
+  });
+
+  admin.post('/api/determinations', async (request, response) => {
+    const ingredientId = parseRecordId(request.body.ingredientId, 'ingredient');
+    const confidence = String(request.body.confidence ?? '').trim();
+    const text = String(request.body.text ?? '').trim();
+    await ensureIngredientExists(pool, ingredientId);
+    if (!confidence || confidence.length > 100) {
+      throw badRequest('Confidence is required (100 characters max).');
+    }
+    if (!text || text.length > 5000) {
+      throw badRequest('Determination is required (5000 characters max).');
+    }
+
+    const result = await pool.query(
+      `INSERT INTO determinations (ingredient_id, confidence, text)
+       VALUES ($1, $2, $3)
+       RETURNING id, ingredient_id, confidence, text`,
+      [ingredientId, confidence, text],
+    );
+    response.status(201).json({ determination: result.rows[0] });
   });
 
   admin.post('/api/research', upload.single('document'), async (request, response) => {
