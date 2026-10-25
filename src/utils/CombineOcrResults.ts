@@ -1,103 +1,120 @@
 import type { OCRResult } from 'react-native-nitro-ocr';
 
-const normalizeWord = (word: string): string =>
-  word.toLowerCase().replace(/^[.,;:()[\]{}]+|[.,;:()[\]{}]+$/g, '');
+// Tolerates common OCR slips like "Ingredlents" / "Ingred1ents"
+const START_RE = /\bingred[i1l]ents?\b\s*[:\-]?/i;
 
-export const combineOcrResults = (results: OCRResult[]): string => {
-  // Get the OCR text from every scan
-  const texts = results.map((result) => result.text.trim()).filter(Boolean);
+// Text that signals the ingredient list is over.
+// "contains" only counts with a colon, because "contains 2% or less of:"
+// is a normal part of ingredient lists.
+const STOP_RE =
+  /\b(contains\s*:|may contain|allergen|manufactured|distributed|produced (in|by)|packed (in|by)|made (in|by)|product of|nutrition facts|supplement facts|best (by|before)|use by|net (wt|weight)|directions|storage|keep refrigerated|questions\??|comments|call (us|\d)|visit|facility|warning)\b|www\.|©/i;
 
-  if (texts.length === 0) {
-    return '';
-  }
-
-  // Convert each scan into words
-  const sequences = texts.map((text) =>
-    text
-      .split(/\s+/)
-      .map((word) => word.trim())
-      .filter(Boolean),
-  );
-
-  // Start with the first scan
-  const merged = [...sequences[0]];
-
-  // Merge each additional scan
-  for (let i = 1; i < sequences.length; i++) {
-    const current = sequences[i];
-
-    if (current.length === 0) {
-      continue;
-    }
-
-    let bestOverlap = 0;
-
-    const maxOverlap = Math.min(merged.length, current.length);
-
-    // Find the largest overlap between the end of the
-    // merged text and the beginning of the new scan.
-    for (let overlap = 1; overlap <= maxOverlap; overlap++) {
-      const mergedEnd = merged.slice(-overlap);
-      const currentStart = current.slice(0, overlap);
-
-      const matches = mergedEnd.every(
-        (word, index) => normalizeWord(word) === normalizeWord(currentStart[index]),
-      );
-
-      if (matches) {
-        bestOverlap = overlap;
-      }
-    }
-
-    if (bestOverlap > 0) {
-      // Add only the words that aren't part of the overlap.
-      merged.push(...current.slice(bestOverlap));
-    } else {
-      // If there is no overlap, add words that haven't
-      // already appeared in the merged result.
-      const newWords = current.filter((word) => {
-        const normalized = normalizeWord(word);
-
-        return !merged.some((existingWord) => normalizeWord(existingWord) === normalized);
-      });
-
-      merged.push(...newWords);
+/** Index of the first period that ends the list (outside parentheses). */
+const findSentenceEnd = (text: string): number => {
+  let depth = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    if (ch === '(' || ch === '[') depth += 1;
+    else if (ch === ')' || ch === ']') depth = Math.max(0, depth - 1);
+    else if (ch === '.' && depth === 0) {
+      const next = text.slice(i + 1);
+      // End of text, or a new sentence starting with a capital letter
+      if (next.trim() === '' || /^\s+[A-Z]/.test(next)) return i;
     }
   }
+  return -1;
+};
 
-  // Turn the merged words back into a single string.
-  const combinedText = merged.join(' ');
+const cleanList = (text: string): string =>
+  text
+    .replace(/[;:•·]+/g, '')
+    .replace(/\.(?!\d)/g, '') // keep decimals like 2.5%
+    .replace(/\s+,/g, ',')
+    .replace(/\s+/g, ' ')
+    .replace(/^[,\s]+|[,\s]+$/g, '')
+    .trim();
 
-  // --------------------------------------------------
-  // Find "Ingredients"
-  // --------------------------------------------------
-
-  const ingredientsMatch = combinedText.match(/\bingredients\b/i);
-
-  if (!ingredientsMatch || ingredientsMatch.index === undefined) {
-    return combinedText;
-  }
-
-  // Start exactly at "Ingredients"
-  const startIndex = ingredientsMatch.index;
-  const fromIngredients = combinedText.slice(startIndex);
-
-  // --------------------------------------------------
-  // Find the first newline after "Ingredients"
-  // --------------------------------------------------
-
-  const newlineIndex = fromIngredients.search(/[\r\n]/);
-
-  // Extract text up to the newline, or use all remaining text
-  // if no newline was detected.
-  const ingredientText = fromIngredients.slice(0, newlineIndex === -1 ? undefined : newlineIndex);
-
-  // --------------------------------------------------
-  // Remove ingredient separators except commas
-  // --------------------------------------------------
-
-  return ingredientText
-    .replace(/[.;:•·]+/g, '')
+/** Pull just the ingredient list out of one scan's text, or null. */
+const extractIngredients = (raw: string): string | null => {
+  const text = raw
+    .replace(/-\s*\n\s*/g, '') // rejoin words hyphenated across lines
     .replace(/\s+/g, ' ')
     .trim();
+
+  const start = text.match(START_RE);
+  if (!start || start.index === undefined) return null;
+
+  let list = text.slice(start.index + start[0].length);
+
+  const stopIndex = list.search(STOP_RE);
+  if (stopIndex !== -1) list = list.slice(0, stopIndex);
+
+  const endIndex = findSentenceEnd(list);
+  if (endIndex !== -1) list = list.slice(0, endIndex);
+
+  const cleaned = cleanList(list);
+  return cleaned || null;
+};
+
+/** Split on commas that aren't inside parentheses. */
+const splitItems = (list: string): string[] => {
+  const items: string[] = [];
+  let depth = 0;
+  let current = '';
+  for (const ch of list) {
+    if (ch === '(' || ch === '[') depth += 1;
+    if (ch === ')' || ch === ']') depth = Math.max(0, depth - 1);
+    if (ch === ',' && depth === 0) {
+      items.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  items.push(current);
+  return items.map((item) => item.toLowerCase().replace(/[^a-z0-9]/g, '')).filter(Boolean);
+};
+
+const similarity = (a: Set<string>, b: Set<string>): number => {
+  let shared = 0;
+  a.forEach((item) => {
+    if (b.has(item)) shared += 1;
+  });
+  const union = a.size + b.size - shared;
+  return union === 0 ? 0 : shared / union;
+};
+
+export const combineOcrResults = (results: OCRResult[]): string => {
+  const texts = results.map((r) => r.text?.trim()).filter(Boolean) as string[];
+  if (texts.length === 0) return '';
+
+  const candidates = texts.map(extractIngredients).filter((c): c is string => c !== null);
+
+  // No scan found an "Ingredients" header: fall back to the raw text
+  if (candidates.length === 0) {
+    return texts.reduce((a, b) => (b.length > a.length ? b : a)).replace(/\s+/g, ' ');
+  }
+  if (candidates.length === 1) return candidates[0];
+
+  // Pick the candidate that agrees most with the other scans.
+  // A scan that was cut off or misread scores low and loses.
+  const sets = candidates.map((c) => new Set(splitItems(c)));
+  let bestIndex = 0;
+  let bestScore = -1;
+
+  candidates.forEach((candidate, i) => {
+    let score = 0;
+    sets.forEach((other, j) => {
+      if (i !== j) score += similarity(sets[i], other);
+    });
+    // Tie-break toward the longer (more complete) list
+    const isBetter =
+      score > bestScore || (score === bestScore && candidate.length > candidates[bestIndex].length);
+    if (isBetter) {
+      bestScore = score;
+      bestIndex = i;
+    }
+  });
+
+  return candidates[bestIndex];
 };
