@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system/legacy'; // on SDK 53 or earlier: 'expo-file-system'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,7 +8,6 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 import { theme } from '../theme';
 import { recognize, type OCRResult } from 'react-native-nitro-ocr';
 import { combineOcrResults } from '../utils/CombineOcrResults';
-import { toBlackAndWhite } from '../utils/toBlackAndWhite';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -57,6 +55,7 @@ export default function HomeScreen({ navigation }: Props) {
     let bwUri: string | undefined;
 
     try {
+      const ImageManipulator = await import('expo-image-manipulator');
       const originX = Math.round(photo.width * FRAME_LEFT);
       const originY = Math.round(photo.height * FRAME_TOP);
       const cropWidth = Math.min(photo.width - originX, Math.round(photo.width * FRAME_WIDTH));
@@ -80,6 +79,7 @@ export default function HomeScreen({ navigation }: Props) {
 
       if (USE_BLACK_AND_WHITE) {
         try {
+          const { toBlackAndWhite } = await import('../utils/toBlackAndWhite');
           bwUri = await toBlackAndWhite(cropped.uri, {
             contrast: BW_CONTRAST,
             threshold: BW_THRESHOLD,
