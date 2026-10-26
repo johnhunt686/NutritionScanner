@@ -6,6 +6,7 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 import { IngredientResult, type IngredientResultTag } from '@/components/ui/IngredientResult';
 import { theme } from '../theme';
 import { useDatabase } from '../../db/useDatabase';
+import { parseIngredients } from '../utils/parseIngredients';
 
 const { semanticColors, spacing, border, typography, radii } = theme;
 
@@ -27,25 +28,25 @@ export default function ScanResult({ route, navigation }: Props) {
 
   useEffect(() => {
     async function loadResults() {
-      const segments = (scannedText ?? '')
-        .replace(/^ingredients:\s*/i, '')
-        .split(',')
-        .map((segment) => segment.trim())
-        .filter((segment) => segment.length > 0);
+      // parseIngredients handles commas inside parentheses, "and/or",
+      // and shared suffixes like "corn, canola, and sunflower oil".
+      const segments = parseIngredients((scannedText ?? '').replace(/^ingredients:\s*/i, ''));
 
       setLoading(true);
 
       try {
-        const databaseResults = await Promise.all(
+        const databaseResults: Result[] = await Promise.all(
           segments.map(async (segment, index) => {
-            const matches = await searchIngredientsByName(segment);
+            const matches = await searchIngredientsByName(segment.name);
             const ingredient = matches[0];
 
             if (!ingredient) {
               return {
                 id: -(index + 1),
-                name: segment,
-                description: 'Not found in the database',
+                name: segment.name,
+                description: segment.parent
+                  ? `Not found in the database (in ${segment.parent})`
+                  : 'Not found in the database',
                 tags: [],
                 matched: false,
               };
@@ -63,7 +64,17 @@ export default function ScanResult({ route, navigation }: Props) {
           }),
         );
 
-        setResults(databaseResults);
+        // The same ingredient can appear twice (e.g. as a parent and again
+        // as a child), so drop repeats of matched ingredients.
+        const seen = new Set<number>();
+        const unique = databaseResults.filter((result) => {
+          if (result.id < 0) return true; // unmatched ids are already unique
+          if (seen.has(result.id)) return false;
+          seen.add(result.id);
+          return true;
+        });
+
+        setResults(unique);
       } catch (error) {
         console.error('Failed to load from database', error);
         setResults([]);
