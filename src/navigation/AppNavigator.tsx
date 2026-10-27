@@ -8,6 +8,7 @@ import Lookup from '../screens/Lookup';
 import ScanConfirmation from '../screens/ScanConfirmation';
 import ScanResult from '../screens/ScanResult';
 import IngredientDetailed from '../screens/IngredientDetailed';
+import Sources from '../screens/Sources';
 import Settings from '../screens/Settings';
 import { AppHeader } from '../components/ui/AppHeader';
 import { theme } from '../theme';
@@ -24,6 +25,7 @@ export type RootStackParamList = {
     ingredientId: number;
   };
   Settings: undefined;
+  Sources: { ingredientId: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -52,6 +54,7 @@ export function AppNavigator() {
         <Stack.Screen name="ScanConfirmation" component={ScanConfirmation} />
         <Stack.Screen name="ScanResult" component={ScanResult} />
         <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="Sources" component={Sources} options={{ title: 'Sources' }} />
         <Stack.Screen
           name="IngredientDetailed"
           component={IngredientDetailed}

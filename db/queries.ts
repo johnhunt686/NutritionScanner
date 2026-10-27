@@ -110,6 +110,8 @@ export async function getIngredientProfile(ingredientId: number) {
         isLink: research.isLink,
         summary: research.summary,
         link: research.link,
+        document: research.document,
+        lastChecked: research.lastChecked,
       })
       .from(ingredientResearch)
       .innerJoin(research, eq(ingredientResearch.researchId, research.id))
