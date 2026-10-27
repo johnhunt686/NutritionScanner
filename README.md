@@ -36,14 +36,19 @@ you will also need to configure .env files for the main project and the backend
 #### ./.env
 
 EXPO_PUBLIC_API_URL=http://127.0.0.1:3000 # for actual device
+
 EXPO_PUBLIC_API_URL=http://10.0.2.2:3000 # for simulator
 
 #### ./backend/.env
 
 DB_USER=appuser
+
 DB_PASSWORD=changeme
+
 DB_NAME=appdb
+
 DB_HOST=localhost
+
 DB_PORT=5432
 
 ### Production
