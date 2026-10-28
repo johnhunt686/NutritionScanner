@@ -22,15 +22,7 @@ type IngredientDetails = {
   }>;
 };
 
-const Concerns = [
-  {
-    id: 'possible-carcinogen',
-    title: 'Possible carcinogen',
-    description: 'Evidence and context will go here when concern data is available.',
-  },
-];
-
-export default function IngredientDetailed({ route }: Props) {
+export default function IngredientDetailed({ route, navigation }: Props) {
   const { ingredientId } = route.params;
   const { getIngredientProfile } = useDatabase();
   const [ingredient, setIngredient] = useState<IngredientDetails | null>(null);
@@ -127,25 +119,11 @@ export default function IngredientDetailed({ route }: Props) {
         <Text style={styles.summary}>{ingredient.summary}</Text>
       </View>
 
-      <View style={styles.concernsSection}>
-        <Text style={styles.sectionTitle}>Concerns</Text>
-        <View style={styles.concernsList}>
-          {Concerns.map((concern) => (
-            <View key={concern.id} style={styles.concernCard}>
-              <View style={styles.concernIcon}>
-                <Ionicons name="warning-outline" size={20} color={semanticColors.theme.alert} />
-              </View>
-              <View style={styles.concernContent}>
-                <Text style={styles.concernTitle}>{concern.title}</Text>
-                <Text style={styles.concernDescription}>{concern.description}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
-
       <View style={styles.action}>
-        <AppButton label="Research/Sources" />
+        <AppButton
+          label="Research/Sources"
+          onPress={() => navigation.navigate('Sources', { ingredientId })}
+        />
       </View>
     </ScrollView>
   );
@@ -243,46 +221,6 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSizes.medium,
     fontFamily: typography.fonts.body,
     lineHeight: typography.fontSizes.medium * typography.lineHeights.normal,
-  },
-  concernsSection: {
-    paddingTop: spacing.xs,
-  },
-  concernsList: {
-    gap: spacing.sm,
-  },
-  concernCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-    padding: spacing.md,
-    backgroundColor: `${semanticColors.theme.alert}10`,
-    borderWidth: border.thin,
-    borderColor: `${semanticColors.theme.alert}50`,
-    borderRadius: radii.large,
-  },
-  concernIcon: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: `${semanticColors.theme.alert}18`,
-    borderRadius: radii.full,
-  },
-  concernContent: {
-    flex: 1,
-  },
-  concernTitle: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-  concernDescription: {
-    marginTop: spacing.xs,
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-    lineHeight: typography.fontSizes.small * typography.lineHeights.normal,
   },
   action: {
     marginTop: spacing.lg,
