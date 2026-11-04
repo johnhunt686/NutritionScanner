@@ -1,8 +1,9 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { theme } from '../../theme';
+import { useAppSettings, vibrateIfEnabled } from '../../state/AppSettingsContext';
 
-const { semanticColors, radii, spacing, border, typography } = theme;
+const { radii, spacing, border, typography } = theme;
 
 export interface BareModalProps {
   visible: boolean;
@@ -25,6 +26,8 @@ export const CoolModal: React.FC<BareModalProps> = ({
   onDeny,
   children,
 }) => {
+  const { colors, settings } = useAppSettings();
+  const styles = createStyles(colors.theme);
   const hasConfirm = Boolean(onConfirm) || true;
   const hasDeny = Boolean(onDeny) || true;
   const showFooter = hasConfirm || hasDeny;
@@ -44,13 +47,25 @@ export const CoolModal: React.FC<BareModalProps> = ({
           {showFooter && (
             <View style={styles.footer}>
               {hasDeny && (
-                <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={onDeny}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonSecondary]}
+                  onPress={() => {
+                    vibrateIfEnabled(settings.vibrations);
+                    onDeny?.();
+                  }}
+                >
                   <Text style={styles.text}>{denyText}</Text>
                 </TouchableOpacity>
               )}
 
               {hasConfirm && (
-                <TouchableOpacity style={[styles.button, styles.buttonPrimary]} onPress={onConfirm}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonPrimary]}
+                  onPress={() => {
+                    vibrateIfEnabled(settings.vibrations);
+                    onConfirm?.();
+                  }}
+                >
                   <Text style={styles.text}>{confirmText}</Text>
                 </TouchableOpacity>
               )}
@@ -62,61 +77,62 @@ export const CoolModal: React.FC<BareModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: semanticColors.theme.overlay,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  container: {
-    width: '80%',
-    backgroundColor: semanticColors.theme.content,
-    borderRadius: radii.large,
-    borderWidth: border.medium,
-    borderColor: semanticColors.theme.border,
-    padding: spacing.lg,
-  },
-  header: {
-    alignItems: 'flex-start',
-    marginBottom: spacing.md,
-  },
-  headerText: {
-    textAlign: 'left',
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.large,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-  body: {
-    width: '100%',
-    marginBottom: spacing.lg,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  button: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.medium,
-    borderWidth: border.medium,
-    flexGrow: 1,
-    borderColor: semanticColors.theme.border,
-  },
-  buttonSecondary: {
-    backgroundColor: semanticColors.theme.notice,
-  },
-  buttonPrimary: {
-    backgroundColor: semanticColors.theme.primary,
-  },
-  text: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.heading,
-  },
-});
+const createStyles = (colors: import('../../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: colors.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    container: {
+      width: '80%',
+      backgroundColor: colors.content,
+      borderRadius: radii.large,
+      borderWidth: border.medium,
+      borderColor: colors.border,
+      padding: spacing.lg,
+    },
+    header: {
+      alignItems: 'flex-start',
+      marginBottom: spacing.md,
+    },
+    headerText: {
+      textAlign: 'left',
+      color: colors.text,
+      fontSize: typography.fontSizes.large,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+    },
+    body: {
+      width: '100%',
+      marginBottom: spacing.lg,
+    },
+    footer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    button: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radii.medium,
+      borderWidth: border.medium,
+      flexGrow: 1,
+      borderColor: colors.border,
+    },
+    buttonSecondary: {
+      backgroundColor: colors.notice,
+    },
+    buttonPrimary: {
+      backgroundColor: colors.primary,
+    },
+    text: {
+      color: colors.text,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.heading,
+    },
+  });

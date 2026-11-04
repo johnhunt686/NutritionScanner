@@ -11,10 +11,13 @@ import {
 } from 'react-native';
 import { syncReferenceData } from '../utils/remoteSync';
 import { theme } from '../theme';
+import { useAppSettings, vibrateIfEnabled } from '../state/AppSettingsContext';
 
-const { semanticColors, radii, spacing, border, typography } = theme;
+const { radii, spacing, border, typography } = theme;
 
 export default function SyncModal() {
+  const { colors, settings } = useAppSettings();
+  const styles = createStyles(colors.theme);
   const [visible, setVisible] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
@@ -64,7 +67,7 @@ export default function SyncModal() {
         <View style={styles.modal}>
           <Text style={styles.title}>Sync Database</Text>
           <Text style={styles.message}>Download the latest ingredient and research data.</Text>
-          {syncing && <ActivityIndicator color={semanticColors.theme.primary} />}
+          {syncing && <ActivityIndicator color={colors.theme.primary} />}
           {syncResult && <Text style={styles.status}>{syncResult}</Text>}
           {syncError && <Text style={styles.error}>{syncError}</Text>}
 
@@ -72,14 +75,24 @@ export default function SyncModal() {
             <TouchableOpacity
               style={styles.button}
               disabled={syncing}
-              onPress={syncResult ? () => setVisible(false) : handleSync}
+              onPress={() => {
+                vibrateIfEnabled(settings.vibrations);
+                if (syncResult) setVisible(false);
+                else void handleSync();
+              }}
             >
               <Text style={styles.buttonText}>
                 {syncing ? 'Syncing...' : syncResult ? 'Done' : 'Check in'}
               </Text>
             </TouchableOpacity>
             {!syncResult && (
-              <TouchableOpacity disabled={syncing} onPress={() => setVisible(false)}>
+              <TouchableOpacity
+                disabled={syncing}
+                onPress={() => {
+                  vibrateIfEnabled(settings.vibrations);
+                  setVisible(false);
+                }}
+              >
                 <Text style={styles.dismissText}>Not now</Text>
               </TouchableOpacity>
             )}
@@ -90,80 +103,81 @@ export default function SyncModal() {
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: semanticColors.theme.overlay,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+const createStyles = (colors: import('../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: colors.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 
-  message: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.body,
-    textAlign: 'center',
-    marginBottom: spacing.md,
-  },
+    message: {
+      color: colors.text,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.body,
+      textAlign: 'center',
+      marginBottom: spacing.md,
+    },
 
-  status: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-  },
+    status: {
+      color: colors.text,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+      textAlign: 'center',
+      marginBottom: spacing.sm,
+    },
 
-  error: {
-    color: semanticColors.theme.notice,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-  },
+    error: {
+      color: colors.notice,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+      textAlign: 'center',
+      marginBottom: spacing.sm,
+    },
 
-  actions: {
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
+    actions: {
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
 
-  modal: {
-    width: '80%',
-    minHeight: 200,
-    padding: spacing.lg,
-    backgroundColor: semanticColors.theme.content,
-    borderRadius: radii.large,
-    borderWidth: border.medium,
-    borderColor: semanticColors.theme.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    modal: {
+      width: '80%',
+      minHeight: 200,
+      padding: spacing.lg,
+      backgroundColor: colors.content,
+      borderRadius: radii.large,
+      borderWidth: border.medium,
+      borderColor: colors.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 
-  title: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.display,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-    marginBottom: spacing.md,
-  },
+    title: {
+      color: colors.text,
+      fontSize: typography.fontSizes.display,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+      marginBottom: spacing.md,
+    },
 
-  button: {
-    backgroundColor: semanticColors.theme.primary,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radii.medium,
-  },
+    button: {
+      backgroundColor: colors.primary,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      borderRadius: radii.medium,
+    },
 
-  buttonText: {
-    color: semanticColors.theme.background,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.heading,
-  },
+    buttonText: {
+      color: colors.background,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.heading,
+    },
 
-  dismissText: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-    padding: spacing.xs,
-  },
-});
+    dismissText: {
+      color: colors.text,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+      padding: spacing.xs,
+    },
+  });

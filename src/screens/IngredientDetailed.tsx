@@ -6,8 +6,9 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 import { AppButton } from '../components/ui/AppButton';
 import { theme } from '../theme';
 import { useDatabase } from '../../db/useDatabase';
+import { useAppSettings } from '../state/AppSettingsContext';
 
-const { semanticColors, spacing, border, typography, radii } = theme;
+const { spacing, border, typography, radii } = theme;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'IngredientDetailed'>;
 
@@ -23,6 +24,8 @@ type IngredientDetails = {
 };
 
 export default function IngredientDetailed({ route, navigation }: Props) {
+  const { colors } = useAppSettings();
+  const styles = createStyles(colors.theme);
   const { ingredientId } = route.params;
   const { getIngredientProfile } = useDatabase();
   const [ingredient, setIngredient] = useState<IngredientDetails | null>(null);
@@ -70,7 +73,7 @@ export default function IngredientDetailed({ route, navigation }: Props) {
   if (loading) {
     return (
       <View style={styles.centeredState}>
-        <ActivityIndicator color={semanticColors.theme.primary} />
+        <ActivityIndicator color={colors.theme.primary} />
         <Text style={styles.stateText}>Loading ingredient...</Text>
       </View>
     );
@@ -94,7 +97,7 @@ export default function IngredientDetailed({ route, navigation }: Props) {
       <View style={[styles.section, styles.tagsSection]}>
         <View style={styles.tags}>
           <View style={styles.tagIcon}>
-            <Ionicons name="pricetag-outline" size={18} color={semanticColors.theme.secondary} />
+            <Ionicons name="pricetag-outline" size={18} color={colors.theme.secondary} />
           </View>
           {ingredient.tags.length > 0 ? (
             ingredient.tags.map((tag) => (
@@ -102,7 +105,7 @@ export default function IngredientDetailed({ route, navigation }: Props) {
                 <View
                   style={[
                     styles.tagColor,
-                    { backgroundColor: tag.color ?? semanticColors.theme.secondary },
+                    { backgroundColor: tag.color ?? colors.theme.secondary },
                   ]}
                 />
                 <Text style={styles.tagText}>{tag.name}</Text>
@@ -129,100 +132,101 @@ export default function IngredientDetailed({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: spacing.md,
-    paddingBottom: spacing.xl,
-  },
-  centeredState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    padding: spacing.lg,
-  },
-  stateText: {
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.body,
-    textAlign: 'center',
-  },
-  header: {
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  name: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.display,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-  formalName: {
-    marginTop: spacing.xs,
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.body,
-  },
-  section: {
-    paddingVertical: spacing.lg,
-  },
-  tagsSection: {
-    paddingTop: spacing.sm,
-    borderBottomWidth: border.medium,
-    borderBottomColor: semanticColors.theme.primary,
-  },
-  sectionTitle: {
-    marginBottom: spacing.sm,
-    color: semanticColors.theme.primary,
-    fontSize: typography.fontSizes.large,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  tagIcon: {
-    width: 28,
-    height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: semanticColors.theme.content,
-    borderRadius: radii.full,
-  },
-  tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    backgroundColor: semanticColors.theme.content,
-    borderRadius: radii.full,
-  },
-  tagColor: {
-    width: 8,
-    height: 8,
-    borderRadius: radii.full,
-  },
-  tagText: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-  },
-  emptyText: {
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-  },
-  summary: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.body,
-    lineHeight: typography.fontSizes.medium * typography.lineHeights.normal,
-  },
-  action: {
-    marginTop: spacing.lg,
-  },
-});
+const createStyles = (colors: import('../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    container: {
+      padding: spacing.md,
+      paddingBottom: spacing.xl,
+    },
+    centeredState: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.sm,
+      padding: spacing.lg,
+    },
+    stateText: {
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.body,
+      textAlign: 'center',
+    },
+    header: {
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xs,
+    },
+    name: {
+      color: colors.text,
+      fontSize: typography.fontSizes.display,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+    },
+    formalName: {
+      marginTop: spacing.xs,
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.body,
+    },
+    section: {
+      paddingVertical: spacing.lg,
+    },
+    tagsSection: {
+      paddingTop: spacing.sm,
+      borderBottomWidth: border.medium,
+      borderBottomColor: colors.primary,
+    },
+    sectionTitle: {
+      marginBottom: spacing.sm,
+      color: colors.primary,
+      fontSize: typography.fontSizes.large,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+    },
+    tags: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    tagIcon: {
+      width: 28,
+      height: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.content,
+      borderRadius: radii.full,
+    },
+    tag: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      backgroundColor: colors.content,
+      borderRadius: radii.full,
+    },
+    tagColor: {
+      width: 8,
+      height: 8,
+      borderRadius: radii.full,
+    },
+    tagText: {
+      color: colors.text,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+    },
+    emptyText: {
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+    },
+    summary: {
+      color: colors.text,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.body,
+      lineHeight: typography.fontSizes.medium * typography.lineHeights.normal,
+    },
+    action: {
+      marginTop: spacing.lg,
+    },
+  });

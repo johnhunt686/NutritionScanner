@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import HomeScreen from '../screens/HomeScreen';
@@ -11,9 +11,7 @@ import IngredientDetailed from '../screens/IngredientDetailed';
 import Sources from '../screens/Sources';
 import Settings from '../screens/Settings';
 import { AppHeader } from '../components/ui/AppHeader';
-import { theme } from '../theme';
-
-const { semanticColors } = theme;
+import { useAppSettings } from '../state/AppSettingsContext';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -31,11 +29,38 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function AppNavigator() {
+  const { colors, settings } = useAppSettings();
+  const navigationTheme = settings.darkMode
+    ? {
+        ...DarkTheme,
+        colors: {
+          ...DarkTheme.colors,
+          background: colors.theme.surface,
+          card: colors.theme.content,
+          text: colors.theme.text,
+          primary: colors.theme.primary,
+          border: colors.theme.border,
+          notification: colors.theme.alert,
+        },
+      }
+    : {
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          background: colors.theme.surface,
+          card: colors.theme.content,
+          text: colors.theme.text,
+          primary: colors.theme.primary,
+          border: colors.theme.border,
+          notification: colors.theme.alert,
+        },
+      };
+
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navigationTheme}>
       <Stack.Navigator
         screenOptions={{
-          contentStyle: { backgroundColor: theme.colors.offWhite },
+          contentStyle: { backgroundColor: colors.theme.surface },
           header: ({ navigation, options, route }) => (
             <AppHeader title={options.title ?? route.name} onBack={() => navigation.goBack()} />
           ),
@@ -46,7 +71,7 @@ export function AppNavigator() {
           component={HomeScreen}
           options={{
             headerShown: false,
-            contentStyle: { backgroundColor: semanticColors.theme.background },
+            contentStyle: { backgroundColor: colors.theme.background },
           }}
         />
         <Stack.Screen name="Preferences" component={Preferences} />

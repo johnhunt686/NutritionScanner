@@ -16,10 +16,13 @@ import type {
   TagOption,
 } from '../components/preferences/types';
 import { theme } from '../theme';
+import { useAppSettings } from '../state/AppSettingsContext';
 
-const { semanticColors, spacing } = theme;
+const { spacing } = theme;
 
 export default function Preferences() {
+  const { colors } = useAppSettings();
+  const styles = createStyles(colors.theme);
   const [preferences, setPreferences] = useState<PreferenceRecord[]>([]);
   const [ingredientOptions, setIngredientOptions] = useState<IngredientOption[]>([]);
   const [tagOptions, setTagOptions] = useState<TagOption[]>([]);
@@ -176,10 +179,7 @@ export default function Preferences() {
         renderOptionLabel={(option) => (
           <View style={styles.tagMeta}>
             <View
-              style={[
-                styles.tagSwatch,
-                { backgroundColor: option.color ?? semanticColors.theme.primary },
-              ]}
+              style={[styles.tagSwatch, { backgroundColor: option.color ?? colors.theme.primary }]}
             />
             <Text style={styles.optionLabel}>{option.name ?? 'Tag'}</Text>
           </View>
@@ -189,26 +189,27 @@ export default function Preferences() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-  },
-  tagMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    flexShrink: 1,
-  },
-  tagSwatch: {
-    width: 14,
-    height: 14,
-    borderRadius: 6,
-  },
-  optionLabel: {
-    color: semanticColors.theme.text,
-    fontSize: 16,
-    fontFamily: 'System',
-    flexShrink: 1,
-  },
-});
+const createStyles = (colors: import('../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+    },
+    tagMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      flexShrink: 1,
+    },
+    tagSwatch: {
+      width: 14,
+      height: 14,
+      borderRadius: 6,
+    },
+    optionLabel: {
+      color: colors.text,
+      fontSize: 16,
+      fontFamily: 'System',
+      flexShrink: 1,
+    },
+  });
