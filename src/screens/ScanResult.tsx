@@ -17,11 +17,13 @@ type Result = {
   description: string;
   tags: IngredientResultTag[];
   matched: boolean;
+  alerted: boolean;
+  alerts: string[];
 };
 
 export default function ScanResult({ route, navigation }: Props) {
   const scannedText = route.params?.scannedText;
-  const { searchIngredientsByName, getIngredientProfile } = useDatabase();
+  const { searchIngredientsByName, getIngredientProfile, getPreferences } = useDatabase();
 
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +37,9 @@ export default function ScanResult({ route, navigation }: Props) {
       setLoading(true);
 
       try {
+        const preferences = await getPreferences();
+        const activePreferences = preferences.filter((preference) => preference.alert);
+
         const databaseResults: Result[] = await Promise.all(
           segments.map(async (segment, index) => {
             const matches = await searchIngredientsByName(segment.name);
@@ -49,10 +54,25 @@ export default function ScanResult({ route, navigation }: Props) {
                   : 'Not found in the database',
                 tags: [],
                 matched: false,
+                alerted: false,
+                alerts: [],
               };
             }
 
             const profile = await getIngredientProfile(ingredient.id);
+
+            const ingredientPreference = activePreferences.find(
+              (preference) => preference.ingredientId === ingredient.id,
+            );
+            const tagPreferences = activePreferences.filter((preference) =>
+              profile?.tags.some((tag) => tag.id === preference.tagId),
+            );
+            const alerts = [
+              ...(ingredientPreference ? [ingredient.commonName ?? ingredient.formalName] : []),
+              ...tagPreferences
+                .map((preference) => preference.tagName)
+                .filter((name): name is string => name !== null),
+            ];
 
             return {
               id: ingredient.id,
@@ -60,6 +80,8 @@ export default function ScanResult({ route, navigation }: Props) {
               description: profile?.descriptions[0]?.descriptionShort ?? 'No Description',
               tags: profile?.tags ?? [],
               matched: true,
+              alerted: alerts.length > 0,
+              alerts,
             };
           }),
         );
@@ -72,6 +94,12 @@ export default function ScanResult({ route, navigation }: Props) {
           if (seen.has(result.id)) return false;
           seen.add(result.id);
           return true;
+        });
+        unique.sort((a, b) => {
+          if (a.alerted == b.alerted) {
+            return 0;
+          }
+          return a.alerted ? -1 : 1;
         });
 
         setResults(unique);
