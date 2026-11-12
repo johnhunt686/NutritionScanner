@@ -14,6 +14,7 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 import { IngredientResult, type IngredientResultTag } from '@/components/ui/IngredientResult';
 import { theme } from '../theme';
 import { useDatabase } from '../../db/useDatabase';
+import { useAppSettings, vibrateIfEnabled } from '../state/AppSettingsContext';
 
 type Result = {
   id: number;
@@ -22,11 +23,13 @@ type Result = {
   tags: IngredientResultTag[];
 };
 
-const { semanticColors, radii, spacing, border, typography } = theme;
+const { radii, spacing, border, typography } = theme;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Lookup'>;
 
 export default function Lookup({ navigation }: Props) {
+  const { colors, settings } = useAppSettings();
+  const styles = createStyles(colors.theme);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,11 +70,11 @@ export default function Lookup({ navigation }: Props) {
     <View style={styles.container}>
       <View style={styles.searchSection}>
         <View style={styles.searchBar}>
-          <Ionicons name="search-outline" size={20} color={semanticColors.theme.primary} />
+          <Ionicons name="search-outline" size={20} color={colors.theme.primary} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search ingredients"
-            placeholderTextColor={semanticColors.theme.primaryAccent}
+            placeholderTextColor={colors.theme.primaryAccent}
             value={search}
             onChangeText={setSearch}
             returnKeyType="search"
@@ -80,12 +83,15 @@ export default function Lookup({ navigation }: Props) {
           {search.length > 0 && (
             <Pressable
               style={({ pressed }) => [styles.clearButton, pressed && styles.clearButtonPressed]}
-              onPress={() => setSearch('')}
+              onPress={() => {
+                vibrateIfEnabled(settings.vibrations);
+                setSearch('');
+              }}
               accessibilityRole="button"
               accessibilityLabel="Clear search"
               hitSlop={8}
             >
-              <Ionicons name="close" size={18} color={semanticColors.theme.primaryAccent} />
+              <Ionicons name="close" size={18} color={colors.theme.primaryAccent} />
             </Pressable>
           )}
         </View>
@@ -99,13 +105,13 @@ export default function Lookup({ navigation }: Props) {
 
       {loading ? (
         <View style={styles.centeredState}>
-          <ActivityIndicator color={semanticColors.theme.primary} />
+          <ActivityIndicator color={colors.theme.primary} />
           <Text style={styles.stateText}>Loading ingredients...</Text>
         </View>
       ) : results.length === 0 ? (
         <View style={styles.centeredState}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="search-outline" size={28} color={semanticColors.theme.primary} />
+            <Ionicons name="search-outline" size={28} color={colors.theme.primary} />
           </View>
           <Text style={styles.emptyTitle}>No ingredients found</Text>
           <Text style={styles.stateText}>
@@ -135,83 +141,84 @@ export default function Lookup({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-    backgroundColor: theme.colors.offWhite,
-  },
-  searchSection: {
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: semanticColors.theme.content,
-    borderWidth: border.thin,
-    borderColor: `${semanticColors.theme.primary}35`,
-    borderRadius: radii.large,
-    paddingLeft: spacing.md,
-    paddingRight: spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.body,
-  },
-  clearButton: {
-    width: 30,
-    height: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.offWhite,
-    borderRadius: radii.full,
-  },
-  clearButtonPressed: {
-    opacity: 0.65,
-  },
-  resultCount: {
-    marginTop: spacing.sm,
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-  },
-  resultsList: {
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  centeredState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  emptyIcon: {
-    width: 52,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-    backgroundColor: semanticColors.theme.content,
-    borderRadius: radii.full,
-  },
-  emptyTitle: {
-    marginBottom: spacing.xs,
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.large,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-  stateText: {
-    marginTop: spacing.sm,
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-    textAlign: 'center',
-  },
-});
+const createStyles = (colors: import('../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+      backgroundColor: colors.surface,
+    },
+    searchSection: {
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    searchBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      backgroundColor: colors.content,
+      borderWidth: border.thin,
+      borderColor: `${colors.primary}35`,
+      borderRadius: radii.large,
+      paddingLeft: spacing.md,
+      paddingRight: spacing.sm,
+    },
+    searchInput: {
+      flex: 1,
+      paddingVertical: spacing.sm,
+      color: colors.text,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.body,
+    },
+    clearButton: {
+      width: 30,
+      height: 30,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radii.full,
+    },
+    clearButtonPressed: {
+      opacity: 0.65,
+    },
+    resultCount: {
+      marginTop: spacing.sm,
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+    },
+    resultsList: {
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    centeredState: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.xl,
+    },
+    emptyIcon: {
+      width: 52,
+      height: 52,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.sm,
+      backgroundColor: colors.content,
+      borderRadius: radii.full,
+    },
+    emptyTitle: {
+      marginBottom: spacing.xs,
+      color: colors.text,
+      fontSize: typography.fontSizes.large,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+    },
+    stateText: {
+      marginTop: spacing.sm,
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+      textAlign: 'center',
+    },
+  });

@@ -1,109 +1,141 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { AppButton } from '../components/ui/AppButton';
 import { Panel } from '../components/ui/SettingsPanel';
 import { SettingsToggleRow } from '../components/ui/SettingsToggleRow';
-import { getUserSettings, updateUserSetting } from '../../db/queries';
+import { useAppSettings, type AppSettingKey } from '../state/AppSettingsContext';
 import { theme } from '../theme';
 
 const { spacing } = theme;
 
-type ToggleSetting = {
-  key: string;
-  label: string;
-  defaultValue: boolean;
-};
-
-const defaultSettings: ToggleSetting[] = [
-  { key: 'darkMode', label: 'Dark mode', defaultValue: false },
-  { key: 'vibrations', label: 'Vibrations', defaultValue: false },
-  { key: 'allergyAlerts', label: 'Allergy alerts', defaultValue: true },
-  { key: 'exploreOnStart', label: 'Explore on start', defaultValue: true },
+const settingsOptions: Array<{ key: AppSettingKey; label: string }> = [
+  { key: 'darkMode', label: 'Dark mode' },
+  { key: 'vibrations', label: 'Vibrations' },
+  { key: 'notifications', label: 'Notifications' },
+  { key: 'devSettings', label: 'Dev Settings' },
 ];
 
-const defaultValues = Object.fromEntries(
-  defaultSettings.map((setting) => [setting.key, setting.defaultValue]),
-);
+const defaultValues = {
+  darkMode: false,
+  vibrations: false,
+  notifications: false,
+  devSettings: false,
+} satisfies Record<AppSettingKey, boolean>;
 
 export default function Settings() {
-  const [settings, setSettings] = useState<Record<string, boolean>>(defaultValues);
-  const [loading, setLoading] = useState(true);
+  const { colors, settings, isReady, updateSetting, requestNotificationsPermission } =
+    useAppSettings();
+  const [resetting, setResetting] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const styles = createStyles(colors.theme);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadSettings() {
-      try {
-        const savedSettings = await getUserSettings();
-
-        if (!isMounted) return;
-
-        const nextValues = { ...defaultValues };
-
-        for (const item of savedSettings) {
-          if (typeof item.value === 'boolean') {
-            nextValues[item.key] = item.value;
-          }
+  async function handleToggle(key: AppSettingKey, value: boolean) {
+    setSaving(true);
+    try {
+      if (key === 'notifications' && value) {
+        const permissionGranted = await requestNotificationsPermission();
+        if (!permissionGranted) {
+          Alert.alert(
+            'Notifications not allowed',
+            'Allow notifications in your device settings to enable them in the app.',
+          );
+          return;
         }
-
-        setSettings(nextValues);
-      } finally {
-        if (isMounted) setLoading(false);
       }
+
+      await updateSetting(key, value);
+    } catch (error) {
+      console.error(`Failed to update ${key} setting:`, error);
+      Alert.alert('Setting not saved', 'Please try changing this setting again.');
+    } finally {
+      setSaving(false);
     }
-
-    loadSettings();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  async function handleToggle(key: string, value: boolean) {
-    setSettings((prev) => ({ ...prev, [key]: value }));
-    await updateUserSetting(key, value);
   }
 
-  function resetToDefaults() {
-    const nextValues = { ...defaultValues };
-    setSettings(nextValues);
+  async function resetToDefaults() {
+    setResetting(true);
+    try {
+      for (const [key, value] of Object.entries(defaultValues) as [AppSettingKey, boolean][]) {
+        await updateSetting(key, value);
+      }
+    } catch (error) {
+      console.error('Failed to reset settings:', error);
+      Alert.alert('Settings not reset', 'Please try resetting your settings again.');
+    } finally {
+      setResetting(false);
+    }
+  }
 
-    for (const [key, value] of Object.entries(nextValues)) {
-      void updateUserSetting(key, value);
+  async function sendTestNotification() {
+    if (!settings.notifications) {
+      Alert.alert('Notifications are off', 'Turn on Notifications before sending a test.');
+      return;
+    }
+
+    try {
+      const Notifications = await import('expo-notifications');
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Test notification',
+          body: 'Notifications are working on your device.',
+        },
+        trigger: null,
+      });
+    } catch (error) {
+      console.error('Failed to send test notification:', error);
+      Alert.alert('Notification failed', 'The test notification could not be sent.');
     }
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.theme.surface }]}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Panel>
-          {defaultSettings.map((setting, index) => (
+          {settingsOptions.map((setting, index) => (
             <SettingsToggleRow
               key={setting.key}
               label={setting.label}
-              value={Boolean(settings[setting.key])}
+              value={settings[setting.key]}
               onValueChange={(value) => void handleToggle(setting.key, value)}
-              disabled={loading}
-              showDivider={index < defaultSettings.length - 1}
+              disabled={!isReady || resetting || saving}
+              showDivider={index < settingsOptions.length - 1}
             />
           ))}
         </Panel>
 
-        <AppButton label={loading ? 'Loading...' : 'Reset defaults'} onPress={resetToDefaults} />
+        {settings.devSettings && (
+          <AppButton
+            label="Send test notification"
+            onPress={() => void sendTestNotification()}
+            disabled={!isReady || resetting || saving}
+          />
+        )}
+
+        <View style={styles.resetButton}>
+          <AppButton
+            label={resetting ? 'Resetting...' : 'Reset defaults'}
+            onPress={() => void resetToDefaults()}
+            disabled={!isReady || resetting || saving}
+          />
+        </View>
       </ScrollView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.offWhite,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.lg,
-  },
-  content: {
-    paddingBottom: spacing.xl,
-  },
-});
+const createStyles = (colors: import('../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.xl,
+      paddingBottom: spacing.lg,
+    },
+    content: {
+      paddingBottom: spacing.xl,
+    },
+    resetButton: {
+      marginTop: spacing.md,
+    },
+  });

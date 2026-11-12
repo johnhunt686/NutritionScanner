@@ -3,12 +3,15 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { theme } from '../theme';
+import { useAppSettings, vibrateIfEnabled } from '../state/AppSettingsContext';
 
-const { semanticColors, spacing, border, typography } = theme;
+const { spacing, border, typography } = theme;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ScanConfirmation'>;
 
 export default function ScanConfirmation({ route, navigation }: Props) {
+  const { colors, settings } = useAppSettings();
+  const styles = createStyles(colors.theme);
   const scannedText =
     route.params?.scannedText ??
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, Ut vel arcu commodo, tincidunt tellus ut, volutpat ex, Nam et massa ullamcorper, bibendum tortor eu, egestas massa.';
@@ -31,56 +34,69 @@ export default function ScanConfirmation({ route, navigation }: Props) {
         <Text style={styles.scannedText}>{scannedText}</Text>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={confirmScan}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          vibrateIfEnabled(settings.vibrations);
+          confirmScan();
+        }}
+      >
         <Text style={styles.buttonText}>Yes</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={retryScan}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          vibrateIfEnabled(settings.vibrations);
+          retryScan();
+        }}
+      >
         <Text style={styles.buttonText}>No</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-  },
+const createStyles = (colors: import('../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+    },
 
-  title: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.xlarge,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-    marginVertical: spacing.md,
-  },
+    title: {
+      color: colors.text,
+      fontSize: typography.fontSizes.xlarge,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+      marginVertical: spacing.md,
+    },
 
-  result: {
-    paddingVertical: spacing.md,
-    borderBottomWidth: border.thin,
-    borderBottomColor: semanticColors.theme.border,
-    borderTopWidth: border.thin,
-    borderTopColor: semanticColors.theme.border,
-    marginBottom: spacing.md,
-  },
+    result: {
+      paddingVertical: spacing.md,
+      borderBottomWidth: border.thin,
+      borderBottomColor: colors.border,
+      borderTopWidth: border.thin,
+      borderTopColor: colors.border,
+      marginBottom: spacing.md,
+    },
 
-  scannedText: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.body,
-  },
+    scannedText: {
+      color: colors.text,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.body,
+    },
 
-  button: {
-    paddingVertical: spacing.md,
-    borderBottomWidth: border.thin,
-    borderBottomColor: semanticColors.theme.border,
-  },
+    button: {
+      paddingVertical: spacing.md,
+      borderBottomWidth: border.thin,
+      borderBottomColor: colors.border,
+    },
 
-  buttonText: {
-    color: semanticColors.theme.primary,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-});
+    buttonText: {
+      color: colors.primary,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+    },
+  });

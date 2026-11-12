@@ -2,8 +2,9 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../theme';
+import { useAppSettings, vibrateIfEnabled } from '../../state/AppSettingsContext';
 
-const { semanticColors, spacing, border, typography, radii } = theme;
+const { spacing, border, typography, radii } = theme;
 
 export type IngredientResultTag = {
   id: number;
@@ -26,6 +27,8 @@ export const IngredientResult: React.FC<IngredientResultProps> = ({
   status = 'matched',
   onPress,
 }) => {
+  const { colors, settings } = useAppSettings();
+  const styles = createStyles(colors.theme);
   const visibleTags = tags.slice(0, 2);
   const remainingTagCount = tags.length - visibleTags.length;
   const isUnmatched = status === 'unmatched';
@@ -37,7 +40,11 @@ export const IngredientResult: React.FC<IngredientResultProps> = ({
         isUnmatched && styles.unmatchedContainer,
         pressed && onPress && styles.pressed,
       ]}
-      onPress={onPress}
+      onPress={() => {
+        if (!onPress) return;
+        vibrateIfEnabled(settings.vibrations);
+        onPress();
+      }}
       disabled={!onPress}
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={
@@ -48,7 +55,7 @@ export const IngredientResult: React.FC<IngredientResultProps> = ({
         <Ionicons
           name={isUnmatched ? 'alert-circle-outline' : 'nutrition-outline'}
           size={21}
-          color={isUnmatched ? semanticColors.theme.alert : semanticColors.theme.primary}
+          color={isUnmatched ? colors.theme.alert : colors.theme.primary}
         />
       </View>
 
@@ -68,7 +75,7 @@ export const IngredientResult: React.FC<IngredientResultProps> = ({
                 <View
                   style={[
                     styles.tagColor,
-                    { backgroundColor: tag.color ?? semanticColors.theme.secondary },
+                    { backgroundColor: tag.color ?? colors.theme.secondary },
                   ]}
                 />
                 <Text style={styles.tagText} numberOfLines={1}>
@@ -85,93 +92,92 @@ export const IngredientResult: React.FC<IngredientResultProps> = ({
         )}
       </View>
 
-      {onPress && (
-        <Ionicons name="chevron-forward" size={20} color={semanticColors.theme.primaryAccent} />
-      )}
+      {onPress && <Ionicons name="chevron-forward" size={20} color={colors.theme.primaryAccent} />}
     </Pressable>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    backgroundColor: semanticColors.theme.content,
-    borderWidth: border.thin,
-    borderColor: `${semanticColors.theme.primary}35`,
-    borderRadius: radii.large,
-  },
-  pressed: {
-    opacity: 0.72,
-  },
-  unmatchedContainer: {
-    backgroundColor: `${semanticColors.theme.alert}08`,
-    borderColor: `${semanticColors.theme.alert}45`,
-  },
-  iconBadge: {
-    width: 38,
-    height: 38,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.offWhite,
-    borderRadius: radii.full,
-  },
-  unmatchedIconBadge: {
-    backgroundColor: `${semanticColors.theme.alert}12`,
-  },
-  content: {
-    flex: 1,
-  },
-  name: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-  description: {
-    marginTop: spacing.xs,
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-    lineHeight: typography.fontSizes.small * typography.lineHeights.normal,
-  },
-  unmatchedDescription: {
-    color: semanticColors.theme.alert,
-  },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-    marginTop: spacing.sm,
-  },
-  tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    maxWidth: 120,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    backgroundColor: theme.colors.offWhite,
-    borderRadius: radii.full,
-  },
-  tagCount: {
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    backgroundColor: theme.colors.offWhite,
-    borderRadius: radii.full,
-  },
-  tagColor: {
-    width: 7,
-    height: 7,
-    borderRadius: radii.full,
-  },
-  tagText: {
-    flexShrink: 1,
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.xsmall,
-    fontFamily: typography.fonts.body,
-  },
-});
+const createStyles = (colors: import('../../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      backgroundColor: colors.content,
+      borderWidth: border.thin,
+      borderColor: `${colors.primary}35`,
+      borderRadius: radii.large,
+    },
+    pressed: {
+      opacity: 0.72,
+    },
+    unmatchedContainer: {
+      backgroundColor: `${colors.alert}08`,
+      borderColor: `${colors.alert}45`,
+    },
+    iconBadge: {
+      width: 38,
+      height: 38,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radii.full,
+    },
+    unmatchedIconBadge: {
+      backgroundColor: `${colors.alert}12`,
+    },
+    content: {
+      flex: 1,
+    },
+    name: {
+      color: colors.text,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+    },
+    description: {
+      marginTop: spacing.xs,
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+      lineHeight: typography.fontSizes.small * typography.lineHeights.normal,
+    },
+    unmatchedDescription: {
+      color: colors.alert,
+    },
+    tags: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
+      marginTop: spacing.sm,
+    },
+    tag: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      maxWidth: 120,
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      backgroundColor: colors.surface,
+      borderRadius: radii.full,
+    },
+    tagCount: {
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      backgroundColor: colors.surface,
+      borderRadius: radii.full,
+    },
+    tagColor: {
+      width: 7,
+      height: 7,
+      borderRadius: radii.full,
+    },
+    tagText: {
+      flexShrink: 1,
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.xsmall,
+      fontFamily: typography.fonts.body,
+    },
+  });

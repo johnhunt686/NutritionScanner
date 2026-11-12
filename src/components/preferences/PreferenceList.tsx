@@ -3,8 +3,9 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 import { theme } from '../../theme';
 import { PreferenceRow } from './PreferenceRow';
 import type { PreferenceRecord } from './types';
+import { useThemeColors } from '../../state/AppSettingsContext';
 
-const { semanticColors, spacing, typography } = theme;
+const { spacing, typography } = theme;
 
 type PreferenceListProps = {
   loading: boolean;
@@ -14,10 +15,13 @@ type PreferenceListProps = {
 };
 
 export function PreferenceList({ loading, preferences, onToggle, onDelete }: PreferenceListProps) {
+  const colors = useThemeColors();
+  const styles = createStyles(colors.theme);
+
   if (loading) {
     return (
       <View style={styles.loadingState}>
-        <ActivityIndicator color={semanticColors.theme.primary} />
+        <ActivityIndicator color={colors.theme.primary} />
         <Text style={styles.emptyText}>Loading preferences...</Text>
       </View>
     );
@@ -55,23 +59,24 @@ export function PreferenceList({ loading, preferences, onToggle, onDelete }: Pre
   );
 }
 
-const styles = StyleSheet.create({
-  loadingState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: spacing.xl,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: spacing.xl,
-  },
-  emptyText: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.body,
-    marginTop: spacing.sm,
-  },
-});
+const createStyles = (colors: import('../../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    loadingState: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: spacing.xl,
+    },
+    emptyState: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: spacing.xl,
+    },
+    emptyText: {
+      color: colors.text,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.body,
+      marginTop: spacing.sm,
+    },
+  });

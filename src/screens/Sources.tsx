@@ -13,14 +13,9 @@ import { Ionicons } from '@expo/vector-icons';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { useDatabase } from '../../db/useDatabase';
 import { theme } from '../theme';
+import { useAppSettings, vibrateIfEnabled } from '../state/AppSettingsContext';
 
-const {
-  semanticColors: { theme: colors },
-  spacing,
-  typography,
-  radii,
-  border,
-} = theme;
+const { spacing, typography, radii, border } = theme;
 type Props = NativeStackScreenProps<RootStackParamList, 'Sources'>;
 type Source = {
   id: number;
@@ -53,6 +48,8 @@ function safeUrl(value: string | null): string | null {
 }
 
 export default function Sources({ route }: Props) {
+  const { colors, settings } = useAppSettings();
+  const styles = createStyles(colors.theme);
   const { ingredientId } = route.params;
   const { getIngredientProfile } = useDatabase();
   const [name, setName] = useState('');
@@ -98,7 +95,7 @@ export default function Sources({ route }: Props) {
   if (loading)
     return (
       <View style={styles.center}>
-        <ActivityIndicator color={colors.primary} />
+        <ActivityIndicator color={colors.theme.primary} />
         <Text style={styles.muted}>Loading sources...</Text>
       </View>
     );
@@ -132,23 +129,24 @@ export default function Sources({ route }: Props) {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Source ${index + 1}, ${isExpanded ? 'collapse' : 'expand'}`}
-                onPress={() =>
+                onPress={() => {
+                  vibrateIfEnabled(settings.vibrations);
                   setExpanded((current) =>
                     isExpanded ? current.filter((id) => id !== source.id) : [...current, source.id],
-                  )
-                }
+                  );
+                }}
               >
                 <View style={styles.cardHeader}>
                   <Ionicons
                     name={source.isLink ? 'link-outline' : 'document-text-outline'}
                     size={20}
-                    color={colors.primary}
+                    color={colors.theme.primary}
                   />
                   <Text style={styles.cardTitle}>Source {index + 1}</Text>
                   <Ionicons
                     name={isExpanded ? 'chevron-up' : 'chevron-down'}
                     size={20}
-                    color={colors.primaryAccent}
+                    color={colors.theme.primaryAccent}
                   />
                 </View>
                 {!isExpanded && (
@@ -166,20 +164,26 @@ export default function Sources({ route }: Props) {
                   {link ? (
                     <Pressable
                       style={styles.action}
-                      onPress={() => void openSource(link)}
+                      onPress={() => {
+                        vibrateIfEnabled(settings.vibrations);
+                        void openSource(link);
+                      }}
                       accessibilityRole="link"
                     >
-                      <Ionicons name="open-outline" size={18} color={colors.primary} />
+                      <Ionicons name="open-outline" size={18} color={colors.theme.primary} />
                       <Text style={styles.actionText}>Open original source</Text>
                     </Pressable>
                   ) : null}
                   {doc && doc !== link ? (
                     <Pressable
                       style={styles.action}
-                      onPress={() => void openSource(doc)}
+                      onPress={() => {
+                        vibrateIfEnabled(settings.vibrations);
+                        void openSource(doc);
+                      }}
                       accessibilityRole="link"
                     >
-                      <Ionicons name="document-outline" size={18} color={colors.primary} />
+                      <Ionicons name="document-outline" size={18} color={colors.theme.primary} />
                       <Text style={styles.actionText}>Open document</Text>
                     </Pressable>
                   ) : null}
@@ -199,83 +203,84 @@ export default function Sources({ route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { padding: spacing.md, paddingBottom: spacing.xl, gap: spacing.sm },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    padding: spacing.lg,
-  },
-  title: {
-    color: colors.text,
-    fontSize: typography.fontSizes.display,
-    fontFamily: typography.fonts.heading,
-  },
-  muted: {
-    color: colors.primaryAccent,
-    fontFamily: typography.fonts.body,
-    fontSize: typography.fontSizes.small,
-  },
-  heading: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  headingText: {
-    color: colors.primary,
-    fontFamily: typography.fonts.heading,
-    fontSize: typography.fontSizes.large,
-  },
-  empty: {
-    color: colors.primaryAccent,
-    fontFamily: typography.fonts.body,
-    marginTop: spacing.lg,
-    textAlign: 'center',
-  },
-  card: {
-    backgroundColor: colors.background,
-    borderWidth: border.thin,
-    borderColor: colors.primary,
-    borderRadius: radii.large,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  cardTitle: {
-    flex: 1,
-    color: colors.text,
-    fontFamily: typography.fonts.heading,
-    fontSize: typography.fontSizes.medium,
-  },
-  preview: {
-    marginTop: spacing.sm,
-    color: colors.primaryAccent,
-    fontFamily: typography.fonts.body,
-    lineHeight: 22,
-  },
-  body: { marginTop: spacing.md, gap: spacing.md },
-  summary: {
-    color: colors.text,
-    fontFamily: typography.fonts.body,
-    fontSize: typography.fontSizes.medium,
-    lineHeight: 24,
-  },
-  action: {
-    borderTopWidth: border.thin,
-    borderTopColor: colors.content,
-    paddingTop: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  actionText: {
-    color: colors.primary,
-    fontFamily: typography.fonts.heading,
-    fontSize: typography.fontSizes.medium,
-  },
-  error: { color: colors.alert, fontFamily: typography.fonts.body },
-});
+const createStyles = (colors: import('../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    container: { padding: spacing.md, paddingBottom: spacing.xl, gap: spacing.sm },
+    center: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.sm,
+      padding: spacing.lg,
+    },
+    title: {
+      color: colors.text,
+      fontSize: typography.fontSizes.display,
+      fontFamily: typography.fonts.heading,
+    },
+    muted: {
+      color: colors.primaryAccent,
+      fontFamily: typography.fonts.body,
+      fontSize: typography.fontSizes.small,
+    },
+    heading: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    headingText: {
+      color: colors.primary,
+      fontFamily: typography.fonts.heading,
+      fontSize: typography.fontSizes.large,
+    },
+    empty: {
+      color: colors.primaryAccent,
+      fontFamily: typography.fonts.body,
+      marginTop: spacing.lg,
+      textAlign: 'center',
+    },
+    card: {
+      backgroundColor: colors.background,
+      borderWidth: border.thin,
+      borderColor: colors.primary,
+      borderRadius: radii.large,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    cardHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+    cardTitle: {
+      flex: 1,
+      color: colors.text,
+      fontFamily: typography.fonts.heading,
+      fontSize: typography.fontSizes.medium,
+    },
+    preview: {
+      marginTop: spacing.sm,
+      color: colors.primaryAccent,
+      fontFamily: typography.fonts.body,
+      lineHeight: 22,
+    },
+    body: { marginTop: spacing.md, gap: spacing.md },
+    summary: {
+      color: colors.text,
+      fontFamily: typography.fonts.body,
+      fontSize: typography.fontSizes.medium,
+      lineHeight: 24,
+    },
+    action: {
+      borderTopWidth: border.thin,
+      borderTopColor: colors.content,
+      paddingTop: spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    actionText: {
+      color: colors.primary,
+      fontFamily: typography.fonts.heading,
+      fontSize: typography.fontSizes.medium,
+    },
+    error: { color: colors.alert, fontFamily: typography.fonts.body },
+  });

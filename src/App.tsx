@@ -7,8 +7,9 @@ import {
   JosefinSans_700Bold,
 } from '@expo-google-fonts/josefin-sans';
 import SyncModal from './screens/SyncModal';
-import { theme } from './theme';
 import { db } from '../db/client';
+import { AppSettingsProvider, useAppSettings } from './state/AppSettingsContext';
+import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
   //declare database to force initialize
@@ -23,7 +24,20 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
+    <AppSettingsProvider>
+      <AppContent />
+    </AppSettingsProvider>
+  );
+}
+
+function AppContent() {
+  const { colors, settings, isReady } = useAppSettings();
+
+  if (!isReady) return null;
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.theme.background }]}>
+      <StatusBar style={settings.darkMode ? 'light' : 'dark'} />
       <AppNavigator />
       <SyncModal />
     </View>
@@ -33,6 +47,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.semanticColors.theme.background,
   },
 });

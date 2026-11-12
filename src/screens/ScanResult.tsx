@@ -7,8 +7,9 @@ import { IngredientResult, type IngredientResultTag } from '@/components/ui/Ingr
 import { theme } from '../theme';
 import { useDatabase } from '../../db/useDatabase';
 import { parseIngredients } from '../utils/parseIngredients';
+import { useAppSettings } from '../state/AppSettingsContext';
 
-const { semanticColors, spacing, border, typography, radii } = theme;
+const { spacing, border, typography, radii } = theme;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ScanResult'>;
 type Result = {
@@ -20,6 +21,8 @@ type Result = {
 };
 
 export default function ScanResult({ route, navigation }: Props) {
+  const { colors } = useAppSettings();
+  const styles = createStyles(colors.theme);
   const scannedText = route.params?.scannedText;
   const { searchIngredientsByName, getIngredientProfile } = useDatabase();
 
@@ -93,7 +96,7 @@ export default function ScanResult({ route, navigation }: Props) {
       <View style={styles.scanPanel}>
         <View style={styles.scanPanelHeader}>
           <View style={styles.scanIcon}>
-            <Ionicons name="scan-outline" size={18} color={semanticColors.theme.secondary} />
+            <Ionicons name="scan-outline" size={18} color={colors.theme.secondary} />
           </View>
           <Text style={styles.scanPanelTitle}>Scanned text</Text>
         </View>
@@ -114,13 +117,13 @@ export default function ScanResult({ route, navigation }: Props) {
 
       {loading ? (
         <View style={styles.centeredState}>
-          <ActivityIndicator color={semanticColors.theme.primary} />
+          <ActivityIndicator color={colors.theme.primary} />
           <Text style={styles.stateText}>Matching ingredients...</Text>
         </View>
       ) : results.length === 0 ? (
         <View style={styles.centeredState}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="scan-outline" size={28} color={semanticColors.theme.primary} />
+            <Ionicons name="scan-outline" size={28} color={colors.theme.primary} />
           </View>
           <Text style={styles.emptyTitle}>No ingredients detected</Text>
           <Text style={styles.stateText}>Try scanning the ingredient list again.</Text>
@@ -150,98 +153,99 @@ export default function ScanResult({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-    backgroundColor: theme.colors.offWhite,
-  },
-  scanPanel: {
-    padding: spacing.md,
-    marginTop: spacing.md,
-    backgroundColor: semanticColors.theme.content,
-    borderWidth: border.thin,
-    borderColor: `${semanticColors.theme.primary}35`,
-    borderRadius: radii.large,
-  },
-  scanPanelHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  scanIcon: {
-    width: 28,
-    height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.offWhite,
-    borderRadius: radii.full,
-  },
-  scanPanelTitle: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.medium,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-  scannedText: {
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.xsmall,
-    fontFamily: typography.fonts.mono,
-    lineHeight: typography.fontSizes.xsmall * typography.lineHeights.normal,
-  },
-  resultsHeader: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  resultsTitle: {
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.large,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-  resultsSummary: {
-    flexShrink: 1,
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-    textAlign: 'right',
-  },
-  resultsList: {
-    paddingBottom: spacing.lg,
-  },
-  centeredState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  emptyIcon: {
-    width: 52,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-    backgroundColor: semanticColors.theme.content,
-    borderRadius: radii.full,
-  },
-  emptyTitle: {
-    marginBottom: spacing.xs,
-    color: semanticColors.theme.text,
-    fontSize: typography.fontSizes.large,
-    fontFamily: typography.fonts.heading,
-    fontWeight: typography.fontWeights.bold,
-  },
-  stateText: {
-    marginTop: spacing.sm,
-    color: semanticColors.theme.primaryAccent,
-    fontSize: typography.fontSizes.small,
-    fontFamily: typography.fonts.body,
-    textAlign: 'center',
-  },
-});
+const createStyles = (colors: import('../theme/colors').SemanticThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+      backgroundColor: colors.surface,
+    },
+    scanPanel: {
+      padding: spacing.md,
+      marginTop: spacing.md,
+      backgroundColor: colors.content,
+      borderWidth: border.thin,
+      borderColor: `${colors.primary}35`,
+      borderRadius: radii.large,
+    },
+    scanPanelHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    scanIcon: {
+      width: 28,
+      height: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radii.full,
+    },
+    scanPanelTitle: {
+      color: colors.text,
+      fontSize: typography.fontSizes.medium,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+    },
+    scannedText: {
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.xsmall,
+      fontFamily: typography.fonts.mono,
+      lineHeight: typography.fontSizes.xsmall * typography.lineHeights.normal,
+    },
+    resultsHeader: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+      gap: spacing.sm,
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    resultsTitle: {
+      color: colors.text,
+      fontSize: typography.fontSizes.large,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+    },
+    resultsSummary: {
+      flexShrink: 1,
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+      textAlign: 'right',
+    },
+    resultsList: {
+      paddingBottom: spacing.lg,
+    },
+    centeredState: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.xl,
+    },
+    emptyIcon: {
+      width: 52,
+      height: 52,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.sm,
+      backgroundColor: colors.content,
+      borderRadius: radii.full,
+    },
+    emptyTitle: {
+      marginBottom: spacing.xs,
+      color: colors.text,
+      fontSize: typography.fontSizes.large,
+      fontFamily: typography.fonts.heading,
+      fontWeight: typography.fontWeights.bold,
+    },
+    stateText: {
+      marginTop: spacing.sm,
+      color: colors.primaryAccent,
+      fontSize: typography.fontSizes.small,
+      fontFamily: typography.fonts.body,
+      textAlign: 'center',
+    },
+  });
