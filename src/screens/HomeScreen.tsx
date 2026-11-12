@@ -148,7 +148,11 @@ export default function HomeScreen({ navigation }: Props) {
 
       if (results.length === TOTAL_PHOTOS) {
         const combinedText = combineOcrResults(results);
-        navigation.navigate('ScanConfirmation', { scannedText: combinedText });
+        if (settings.devSettings) {
+          navigation.navigate('ScanConfirmation', { scannedText: combinedText });
+        } else {
+          navigation.navigate('ScanResult', { scannedText: combinedText });
+        }
       } else {
         setError('Could not capture all five images. Please try again.');
       }
