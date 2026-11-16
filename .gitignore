@@ -29,3 +29,6 @@ ios/
 # Build outputs
 dist/
 build/
+
+# Uploaded research documents
+/backend/research/
