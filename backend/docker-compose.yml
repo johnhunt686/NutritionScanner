@@ -32,11 +32,10 @@ services:
       - '3000:3000'
       - '127.0.0.1:3001:3001'
     volumes:
-      - research_files:/data/research
+      - ./research:/data/research
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   pgdata:
-  research_files:

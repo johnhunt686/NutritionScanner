@@ -25,6 +25,12 @@ once you can see the containers all you need to do is start the verify they are 
 (open data entry)[http://localhost:3001]
 (open api health check)[http://localhost:3000/health]
 
+Uploaded research PDFs are stored on the host in `backend/research/`, mounted into
+the API container at `/data/research`. This folder is created automatically and is
+shared with any other host application that needs to read the PDFs. If you already
+have PDFs in the previous Docker-managed `research_files` volume, copy them into
+`backend/research/` before switching to this bind mount.
+
 if using a tethered phone ensure that you run either
 
 - ./devScripts/androidTunnel.sh
